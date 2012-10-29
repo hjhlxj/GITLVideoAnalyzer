@@ -1,0 +1,29 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GITLVideoAnalyser", "GITLVideoAnalyser\GITLVideoAnalyser.vcxproj", "{1441187B-AF8E-474E-AFD0-C69AB0BF812A}"
+EndProject
+Global
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccLocalPath0 = .
+		SccLocalPath1 = GITLVideoAnalyser
+		SccNumberOfProjects = 2
+		SccProjectName1 = GITLVideoAnalyser
+		SccProjectUniqueName1 = GITLVideoAnalyser\\GITLVideoAnalyser.vcxproj
+		SccTeamFoundationServer = https://hjianh.tfspreview.com/defaultcollection
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1441187B-AF8E-474E-AFD0-C69AB0BF812A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{1441187B-AF8E-474E-AFD0-C69AB0BF812A}.Debug|Win32.Build.0 = Debug|Win32
+		{1441187B-AF8E-474E-AFD0-C69AB0BF812A}.Release|Win32.ActiveCfg = Release|Win32
+		{1441187B-AF8E-474E-AFD0-C69AB0BF812A}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
