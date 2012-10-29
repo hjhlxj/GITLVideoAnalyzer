@@ -24,14 +24,15 @@ sysuVideo::YUVReader::~YUVReader(void)
 		delete [] V;
 }
 
-BOOL sysuVideo::YUVReader::GetNextFrame(CImage *img) 
+const CImage& sysuVideo::YUVReader::GetNextFrame() 
 {	
-	if (img == NULL || !HasNextFrame() || !isStreamOpen)
-		return FALSE;
+	if (!HasNextFrame() || !isStreamOpen)
+		throw EXCEPTION_ACCESS_VIOLATION;
 
-	int rowUV = width / 2, posUV, cnt = 0;
+	int rowUV = width / 2, posUV, cnt = 0, bcnt = -1, pitch = frameBuf.GetPitch();
+	LPBYTE bits = (LPBYTE)frameBuf.GetBits();
 	BYTE R, G, B;
-
+	
 	fread(Y, sizeof(BYTE), YCount, videoStream);
 	fread(U, sizeof(BYTE), UCount, videoStream);
 	fread(V, sizeof(BYTE), VCount, videoStream);
@@ -44,44 +45,51 @@ BOOL sysuVideo::YUVReader::GetNextFrame(CImage *img)
 			R = Y[cnt] + coeRV * (V[posUV] - 128);
 			G = Y[cnt] + coeGU * (U[posUV] - 128) + coeGV * (V[posUV] - 128);
 			B = Y[cnt] + coeBU * (U[posUV] - 128);
-			frameBuf.SetPixelRGB(j, i, R, G, B);
+			//frameBuf.SetPixelRGB(j, i, R, G, B);
+			bits[++bcnt] = B;
+			bits[++bcnt] = G;
+			bits[++bcnt] = R;
 			++cnt;
 		}
+
+		bcnt = -1;
+		bits += pitch;
 	}
 
 	++curFrameCnt;
 
-	return GetCurFrame(img);
+	return GetCurFrame();
 }
 
-BOOL sysuVideo::YUVReader::GetCurFrame(CImage *img) 
+const CImage& sysuVideo::YUVReader::GetCurFrame() 
 {
-	CDC *pDCsrc, *pDCdst;
+	//CDC *pDCsrc, *pDCdst;
 
-	if (img == NULL)
-		return FALSE;
-	if (img == &frameBuf)	//For initialization
-		return TRUE;
-	if (!img->IsNull())
-		img->Destroy();
-	img->Create(width, height, nbpp);
-	
-	pDCsrc = CDC::FromHandle(frameBuf.GetDC());
-	pDCdst = CDC::FromHandle(img->GetDC());
-	pDCdst->BitBlt(0, 0, frameBuf.GetWidth(), frameBuf.GetHeight(), pDCsrc, 0, 0, SRCCOPY);
-	
-	frameBuf.ReleaseDC();
-	img->ReleaseDC();
+	//if (img == NULL)
+	//	return FALSE;
+	//if (img == &frameBuf)	//For initialization
+	//	return TRUE;
+	//if (!img->IsNull())
+	//	img->Destroy();
+	//img->Create(width, height, nbpp);
+	//
+	//pDCsrc = CDC::FromHandle(frameBuf.GetDC());
+	//pDCdst = CDC::FromHandle(img->GetDC());
+	//pDCdst->BitBlt(0, 0, frameBuf.GetWidth(), frameBuf.GetHeight(), pDCsrc, 0, 0, SRCCOPY);
+	//
+	//frameBuf.ReleaseDC();
+	//img->ReleaseDC();
 	//memcpy(img, &frameBuf, sizeof(frameBuf));--
-	return TRUE;
+	return frameBuf;
 }
 
-BOOL sysuVideo::YUVReader::GetPreFrame(CImage *img) 
+const CImage& sysuVideo::YUVReader::GetPreFrame() 
 {	
-	if (img == NULL || !HasPreFrame() || !isStreamOpen)
-		return FALSE;
+	if (!HasPreFrame() || !isStreamOpen)
+		throw EXCEPTION_ACCESS_VIOLATION;
 
-	int rowUV = width / 2, posUV, cnt = 0;
+	int rowUV = width / 2, posUV, cnt = 0, bcnt = -1, pitch = frameBuf.GetPitch();
+	LPBYTE bits = (LPBYTE)frameBuf.GetBits();
 	BYTE R, G, B;
 
 	int tmp = fseek(videoStream, -2 * (YCount + UCount + VCount), SEEK_CUR);
@@ -98,13 +106,19 @@ BOOL sysuVideo::YUVReader::GetPreFrame(CImage *img)
 			R = Y[cnt] + coeRV * (V[posUV] - 128);
 			G = Y[cnt] + coeGU * (U[posUV] - 128) + coeGV * (V[posUV] - 128);
 			B = Y[cnt] + coeBU * (U[posUV] - 128);
-			frameBuf.SetPixelRGB(j, i, R, G, B);
+			//frameBuf.SetPixelRGB(j, i, R, G, B);
+			bits[++bcnt] = B;
+			bits[++bcnt] = G;
+			bits[++bcnt] = R;
 			++cnt;
 		}
+
+		bcnt = -1;
+		bits += pitch;
 	}
 
 	--curFrameCnt;
-	return GetCurFrame(img);
+	return GetCurFrame();
 }
 
 BOOL sysuVideo::YUVReader::Init(LPVOID initInfo)
@@ -137,9 +151,9 @@ BOOL sysuVideo::YUVReader::Init(LPVOID initInfo)
 
 	frameCnt = filesize / (YCount + UCount + VCount);
 
-	GetNextFrame(&frameBuf);	//Ready for show
 	curFrameCnt = 0;
-
+	GetNextFrame();	//Ready for show
+	
 	return TRUE;
 }
 
@@ -170,10 +184,10 @@ void sysuVideo::YUVReader::Save(LPCWSTR filepath, LPVOID saveInfo)
 
 BOOL sysuVideo::YUVReader::HasNextFrame() const
 {
-	return this->curFrameCnt < this->frameCnt;
+	return curFrameCnt < frameCnt;
 }
 
 BOOL sysuVideo::YUVReader::HasPreFrame() const
 {
-	return this->curFrameCnt > 0;
+	return curFrameCnt > 0;
 }

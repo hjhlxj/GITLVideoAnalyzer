@@ -65,12 +65,8 @@ void CGITLVideoAnalyserView::OnDraw(CDC* pDC)
 	
 	((CMainFrame *)GetParent())->m_wndToolBox.SetTotalFrameCnt(pDoc->videoReader->GetFrameCount());
 
-	CImage *cimg = new CImage();
-
-	if (this->GetDocument()->videoReader->GetCurFrame(cimg))
-		cimg->Draw(pDC->m_hDC, 0, 0, cimg->GetWidth(), cimg->GetHeight());
-
-	delete cimg;
+	const CImage& cimg = this->GetDocument()->videoReader->GetCurFrame();
+	cimg.Draw(pDC->m_hDC, 0, 0, cimg.GetWidth(), cimg.GetHeight());
 }
 
 
@@ -122,16 +118,11 @@ CGITLVideoAnalyserDoc* CGITLVideoAnalyserView::GetDocument() const // non-debug 
 BOOL CGITLVideoAnalyserView::ShowNextFrame(void)
 {
 	CDC *pDC = this->GetDC();
-	CImage *cimg = new CImage();
 	BOOL showStatus = FALSE;
 
-	if (this->GetDocument()->videoReader->GetNextFrame(cimg))
-	{
-		cimg->Draw(pDC->m_hDC, 0, 0, cimg->GetWidth(), cimg->GetHeight());
-		showStatus = TRUE;
-	}
-
-	delete cimg;
+	const CImage& cimg = this->GetDocument()->videoReader->GetNextFrame();
+	cimg.Draw(pDC->m_hDC, 0, 0, cimg.GetWidth(), cimg.GetHeight());
+	showStatus = TRUE;
 	
 	return showStatus;
 }
@@ -139,16 +130,11 @@ BOOL CGITLVideoAnalyserView::ShowNextFrame(void)
 BOOL CGITLVideoAnalyserView::ShowPreFrame(void)
 {
 	CDC *pDC = this->GetDC();
-	CImage *cimg = new CImage();
 	BOOL showStatus = FALSE;
 
-	if (this->GetDocument()->videoReader->GetPreFrame(cimg))
-	{
-		cimg->Draw(pDC->m_hDC, 0, 0, cimg->GetWidth(), cimg->GetHeight());
-		showStatus = TRUE;
-	}
-
-	delete cimg;
+	const CImage& cimg = this->GetDocument()->videoReader->GetPreFrame();
+	cimg.Draw(pDC->m_hDC, 0, 0, cimg.GetWidth(), cimg.GetHeight());
+	showStatus = TRUE;
 
 	return showStatus;
 }

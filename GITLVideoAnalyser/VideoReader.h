@@ -18,9 +18,9 @@ namespace sysuVideo
 		virtual ~VideoReader(void);
 		virtual BOOL HasNextFrame() const = 0;
 		virtual BOOL HasPreFrame() const = 0;
-		virtual BOOL GetNextFrame(CImage *) = 0;
-		virtual BOOL GetPreFrame(CImage *) = 0;
-		virtual BOOL GetCurFrame(CImage *) = 0;
+		virtual const CImage& GetNextFrame() = 0;
+		virtual const CImage& GetPreFrame() = 0;
+		virtual const CImage& GetCurFrame() = 0;
 		virtual BOOL Init(LPVOID /*structure of initialization info*/) = 0;
 		virtual BOOL Open(LPCWSTR /*file path*/);
 		virtual void Save(LPCWSTR /*file path*/, LPVOID /*structure of save info*/) = 0;

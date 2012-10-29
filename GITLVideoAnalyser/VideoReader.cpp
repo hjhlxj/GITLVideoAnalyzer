@@ -73,7 +73,7 @@ BOOL sysuVideo::VideoReader::Open(LPCWSTR fileName)
 {	
 	BOOL openSuccess = TRUE;
 	
-	if (!_wfopen_s(&videoStream, fileName, _T("rb")))
+	if (0 != _wfopen_s(&videoStream, fileName, _T("rb")))
 		openSuccess = FALSE;
 	else	
 		isStreamOpen = TRUE;	
