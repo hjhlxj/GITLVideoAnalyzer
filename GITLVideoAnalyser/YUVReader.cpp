@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "YUVReader.h"
-
+#include "BlockDrawer.h"
 
 sysuVideo::YUVReader::YUVReader(void) :
 	coeRV(1.13983), coeGU(-0.39465), coeGV(-0.58060), coeBU(2.03211)
@@ -11,6 +11,7 @@ sysuVideo::YUVReader::YUVReader(void) :
 	coeBU = 2.03211;*/
 	nbpp = 24;
 	Y = U = V = NULL;
+	imgDeco = NULL;
 }
 
 sysuVideo::YUVReader::~YUVReader(void)
@@ -22,6 +23,9 @@ sysuVideo::YUVReader::~YUVReader(void)
 		delete [] U;
 	if (V != NULL)
 		delete [] V;
+	if (imgDeco != NULL)
+		delete imgDeco;
+
 }
 
 const CImage& sysuVideo::YUVReader::GetNextFrame() 
@@ -80,6 +84,8 @@ const CImage& sysuVideo::YUVReader::GetCurFrame()
 	//frameBuf.ReleaseDC();
 	//img->ReleaseDC();
 	//memcpy(img, &frameBuf, sizeof(frameBuf));--
+
+	imgDeco->decorate(&frameBuf, (int)curFrameCnt);
 	return frameBuf;
 }
 
@@ -150,6 +156,8 @@ BOOL sysuVideo::YUVReader::Init(LPVOID initInfo)
 	fseek(videoStream, 0L, SEEK_SET);
 
 	frameCnt = filesize / (YCount + UCount + VCount);
+
+	imgDeco = new BlockDrawer(&frameBuf);
 
 	curFrameCnt = 0;
 	GetNextFrame();	//Ready for show

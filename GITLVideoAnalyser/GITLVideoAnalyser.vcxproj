@@ -108,11 +108,13 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BlockDrawer.h" />
     <ClInclude Include="CodeRef.h" />
     <ClInclude Include="ControlDialogBar.h" />
     <ClInclude Include="GITLVideoAnalyser.h" />
     <ClInclude Include="GITLVideoAnalyserDoc.h" />
     <ClInclude Include="GITLVideoAnalyserView.h" />
+    <ClInclude Include="ImageDecorator.h" />
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
@@ -121,6 +123,7 @@
     <ClInclude Include="YUVReader.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BlockDrawer.cpp" />
     <ClCompile Include="CodeRef.cpp" />
     <ClCompile Include="ControlDialogBar.cpp" />
     <ClCompile Include="GITLVideoAnalyser.cpp" />

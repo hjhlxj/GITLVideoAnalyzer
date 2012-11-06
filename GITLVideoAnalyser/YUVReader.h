@@ -1,7 +1,7 @@
 #pragma once
 
 #include "VideoReader.h"
-
+#include "ImageDecorator.h"
 
 namespace sysuVideo
 {
@@ -26,6 +26,7 @@ namespace sysuVideo
 		LPBYTE U;
 		LPBYTE V;
 		CImage frameBuf;
+		ImageDecorator *imgDeco;
 
 		int YCount;
 		int UCount;

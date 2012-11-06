@@ -19,52 +19,52 @@ sysuVideo::VideoReader::~VideoReader(void)
 		fclose(videoStream);
 }
 
-int sysuVideo::VideoReader::GetWidth() const
+inline int sysuVideo::VideoReader::GetWidth() const
 {
 	return this->height;
 }
 
-void sysuVideo::VideoReader::SetWidth(int widthVal) 
+inline void sysuVideo::VideoReader::SetWidth(int widthVal) 
 {
 	this->width = widthVal;
 }
 
-int sysuVideo::VideoReader::GetHeight() const
+inline int sysuVideo::VideoReader::GetHeight() const
 {
 	return this->height;
 }
 
-void sysuVideo::VideoReader::SetHeight(int heightVal) 
+inline void sysuVideo::VideoReader::SetHeight(int heightVal) 
 {
 	this->height = heightVal;
 }
 
-double sysuVideo::VideoReader::GetFrameRate() const
+inline double sysuVideo::VideoReader::GetFrameRate() const
 {
 	return this->frameRate;
 }
 
-void sysuVideo::VideoReader::SetFrameRate(double frameRateVal) 
+inline void sysuVideo::VideoReader::SetFrameRate(double frameRateVal) 
 {
 	this->frameRate = frameRateVal;
 }
 
-unsigned long sysuVideo::VideoReader::GetFrameCount() const 
+inline unsigned long sysuVideo::VideoReader::GetFrameCount() const 
 {
 	return this->frameCnt;
 }
 
-unsigned long sysuVideo::VideoReader::GetCurrentFrameNum() const 
+inline unsigned long sysuVideo::VideoReader::GetCurrentFrameNum() const 
 {
 	return this->curFrameCnt;
 }
 
-void sysuVideo::VideoReader::SetNBPP(int nBitsPerPixel)
+inline void sysuVideo::VideoReader::SetNBPP(int nBitsPerPixel)
 {
 	this->nbpp = nBitsPerPixel;
 }
 
-int sysuVideo::VideoReader::GetNBPP() const
+inline int sysuVideo::VideoReader::GetNBPP() const
 {
 	return this->nbpp;
 }
@@ -81,7 +81,7 @@ BOOL sysuVideo::VideoReader::Open(LPCWSTR fileName)
 	return openSuccess;
 }
 
-BOOL sysuVideo::VideoReader::IsVideoStreamOpen() const
+inline BOOL sysuVideo::VideoReader::IsVideoStreamOpen() const
 {	
 	return isStreamOpen;
 }
