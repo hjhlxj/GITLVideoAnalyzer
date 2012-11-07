@@ -21,7 +21,10 @@ namespace sysuVideo
 		virtual void Save(LPCWSTR /*file path*/, LPVOID /*structure of save info*/);
 		virtual BOOL InitViaFilepath(CString /*filepath*/);
 
-	protected:
+	protected:	//Member functions
+		void constructFrame();
+
+	protected:	//Fields and Attributes
 		LPBYTE Y;
 		LPBYTE U;
 		LPBYTE V;

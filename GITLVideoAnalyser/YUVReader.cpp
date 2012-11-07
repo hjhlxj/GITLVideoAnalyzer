@@ -9,7 +9,7 @@ sysuVideo::YUVReader::YUVReader(void) :
 	coeGU = -0.39465;
 	coeGV = -0.58060;
 	coeBU = 2.03211;*/
-	nbpp = 24;
+	nbpp = 32;
 	Y = U = V = NULL;
 	imgDeco = NULL;
 }
@@ -28,11 +28,8 @@ sysuVideo::YUVReader::~YUVReader(void)
 
 }
 
-const CImage& sysuVideo::YUVReader::GetNextFrame() 
-{	
-	if (!HasNextFrame() || !isStreamOpen)
-		throw EXCEPTION_ACCESS_VIOLATION;
-
+inline void sysuVideo::YUVReader::constructFrame()
+{
 	int rowUV = width / 2, posUV, cnt = 0, bcnt = -1, pitch = frameBuf.GetPitch();
 	LPBYTE bits = (LPBYTE)frameBuf.GetBits();
 	BYTE R, G, B;
@@ -53,13 +50,21 @@ const CImage& sysuVideo::YUVReader::GetNextFrame()
 			bits[++bcnt] = B;
 			bits[++bcnt] = G;
 			bits[++bcnt] = R;
+			bits[++bcnt] = 255;
 			++cnt;
 		}
 
 		bcnt = -1;
 		bits += pitch;
 	}
+}
 
+const CImage& sysuVideo::YUVReader::GetNextFrame() 
+{	
+	if (!HasNextFrame() || !isStreamOpen)
+		throw EXCEPTION_ACCESS_VIOLATION;
+
+	constructFrame();	
 	++curFrameCnt;
 
 	return GetCurFrame();
@@ -85,7 +90,7 @@ const CImage& sysuVideo::YUVReader::GetCurFrame()
 	//img->ReleaseDC();
 	//memcpy(img, &frameBuf, sizeof(frameBuf));--
 
-	imgDeco->decorate(&frameBuf, (int)curFrameCnt);
+	imgDeco->Decorate(&frameBuf, (int)curFrameCnt);
 	return frameBuf;
 }
 
@@ -94,36 +99,10 @@ const CImage& sysuVideo::YUVReader::GetPreFrame()
 	if (!HasPreFrame() || !isStreamOpen)
 		throw EXCEPTION_ACCESS_VIOLATION;
 
-	int rowUV = width / 2, posUV, cnt = 0, bcnt = -1, pitch = frameBuf.GetPitch();
-	LPBYTE bits = (LPBYTE)frameBuf.GetBits();
-	BYTE R, G, B;
-
-	int tmp = fseek(videoStream, -2 * (YCount + UCount + VCount), SEEK_CUR);
-
-	if (0 == fread(Y, sizeof(BYTE), YCount, videoStream));
-	fread(U, sizeof(BYTE), UCount, videoStream);
-	fread(V, sizeof(BYTE), VCount, videoStream);
-
-	for (int i = 0; i < height; ++i)
-	{
-		for (int j = 0; j < width; ++j)
-		{
-			posUV = (i / 2) * rowUV + (j / 2);
-			R = Y[cnt] + coeRV * (V[posUV] - 128);
-			G = Y[cnt] + coeGU * (U[posUV] - 128) + coeGV * (V[posUV] - 128);
-			B = Y[cnt] + coeBU * (U[posUV] - 128);
-			//frameBuf.SetPixelRGB(j, i, R, G, B);
-			bits[++bcnt] = B;
-			bits[++bcnt] = G;
-			bits[++bcnt] = R;
-			++cnt;
-		}
-
-		bcnt = -1;
-		bits += pitch;
-	}
-
+	fseek(videoStream, -2 * (YCount + UCount + VCount), SEEK_CUR);
+	constructFrame();
 	--curFrameCnt;
+
 	return GetCurFrame();
 }
 
@@ -144,7 +123,7 @@ BOOL sysuVideo::YUVReader::Init(LPVOID initInfo)
 		}
 	}
 
-	frameBuf.Create(width, height, nbpp); 
+	frameBuf.Create(width, height, nbpp, CImage::createAlphaChannel); 
 	YCount = width * height;
 	UCount = VCount = YCount / 4;
 	Y = new BYTE[YCount];

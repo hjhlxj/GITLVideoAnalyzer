@@ -5,10 +5,15 @@ namespace sysuVideo
 	class ImageDecorator
 	{
 	public:
-		ImageDecorator(void) {};
+		ImageDecorator(void) : enable(TRUE) {};
 		virtual ~ImageDecorator(void) {};
 		
-		virtual void addParams(void *) = 0;
-		virtual void decorate(void * /* pointer to the image */, ...) = 0;
+		virtual BOOL IsEnalbe() const { return enable; }
+		virtual void Disable(BOOL flag) { enable = flag; }
+		virtual void AddParams(void *) = 0;
+		virtual void Decorate(void * /* pointer to the image */, ...) = 0;
+
+	protected: 
+		BOOL enable;
 	};
 }
