@@ -12,24 +12,36 @@ namespace sysuVideo
 
 		virtual void AddParams(void *);
 		virtual void Decorate(void * /* pointer to the image */, ...);
-		
+
 	protected:	//Helper function
-		void drawBlockInfo();
+		void drawBlockInfo(void);
 	private:
-		BOOL splitContinue();
-		void drawCU(RECT * /* CU block */);
+		BOOL splitContinue(RECT * /* CU block */);
+		void drawCU(RECT * /* CU block */, BOOL splitCU = FALSE);
 		BOOL getNextLCU(RECT * /* LCU */);
+		void localeCUInfo(void);
+		BOOL reachAtomicSize(RECT * /* CU block */);
+		void moveToCUInfoBeginLine(void);
 
 	private:
 		CImage imgLayout;
 		CImage *imgBase;
 		CDC *pDC;
 		CPen pen;
-		int penStyle;
-		int penWidth;
-		COLORREF penColor;
 		RECT curLCU;
 
 		int LCUSIZE;
+
+		//split related variables
+		unsigned long workingFrameCnt;
+		unsigned long frmCnt;
+		int CUCnt;
+		LPBYTE splitFlags;
+		int sfcursor;
+		int sflength;
+		BOOL frameReset;
+
+		int width;
+		int height;
 	};
 }

@@ -139,8 +139,8 @@ BOOL sysuVideo::YUVReader::Init(LPVOID initInfo)
 	imgDeco = new BlockDrawer(&frameBuf);
 
 	curFrameCnt = 0;
-	GetNextFrame();	//Ready for show
-	
+	constructFrame();	//Ready for show
+
 	return TRUE;
 }
 

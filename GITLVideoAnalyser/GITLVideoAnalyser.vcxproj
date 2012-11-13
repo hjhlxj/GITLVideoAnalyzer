@@ -129,6 +129,7 @@
     <ClCompile Include="GITLVideoAnalyser.cpp" />
     <ClCompile Include="GITLVideoAnalyserDoc.cpp" />
     <ClCompile Include="GITLVideoAnalyserView.cpp" />
+    <ClCompile Include="ImageDecorator.cpp" />
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
