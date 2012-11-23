@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "YUVReader.h"
-#include "BlockDrawer.h"
+#include "BlockRelatedDrawer.h"
 
 sysuVideo::YUVReader::YUVReader(void) :
 	coeRV(1.13983), coeGU(-0.39465), coeGV(-0.58060), coeBU(2.03211)
@@ -136,7 +136,7 @@ BOOL sysuVideo::YUVReader::Init(LPVOID initInfo)
 
 	frameCnt = filesize / (YCount + UCount + VCount);
 
-	imgDeco = new BlockDrawer(&frameBuf);
+	imgDeco = new BlockRelatedDrawer(&frameBuf);
 
 	curFrameCnt = 0;
 	constructFrame();	//Ready for show
