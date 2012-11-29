@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "BlockRelatedDrawer.h"
 #include "CUDrawer.h"
+#include "PUDrawer.h"
 #include <cstdarg>
 #include <stack>
 #include <algorithm>
@@ -10,10 +11,14 @@ sysuVideo::BlockRelatedDrawer::BlockRelatedDrawer(CImage *ci)
 	imgBase = ci;
 	imgLayout.Create(ci->GetWidth(), ci->GetHeight(), 32, CImage::createAlphaChannel);
 	drawers.push_back(new CUDrawer());
-	(**(drawers.rbegin())).Init(_T("d:/master/cu.txt"));
+	(**(drawers.rbegin())).Init(_T("d:/master/rc/decoder_cupu.txt"));
+	drawers.push_back(new PUDrawer());
+	(**(drawers.rbegin())).Init(_T("d:/master/rc/decoder_cupu.txt"));
 	bsmgr = new BlockSequenceManager(_T("d:/master/cu.txt"), ci);
 	bsmgr->BuildIndex();
-	activeDrawers.push_back(drawers[0]);
+	
+	for (StreamDirectedDrawer *sdd : drawers)
+		activeDrawers.push_back(sdd);
 }
 
 sysuVideo::BlockRelatedDrawer::~BlockRelatedDrawer()
@@ -50,7 +55,7 @@ void sysuVideo::BlockRelatedDrawer::AddParams(void *)
 
 void sysuVideo::BlockRelatedDrawer::drawBlockInfo()
 {
-	static RECT cu;
+	static ImgBlcok block;
 	static CDC dc;
 	CImage *ci = &imgLayout;
 	unsigned long frm = workingFrameCnt;
@@ -66,10 +71,10 @@ void sysuVideo::BlockRelatedDrawer::drawBlockInfo()
 
 	hdc = imgLayout.GetDC();
 	pDC->Attach(hdc);
-	while (bsmgr->GetNextBlock(&cu))
+	while (bsmgr->GetNextBlock(&block))
 	{
 		std::for_each(activeDrawers.begin(), activeDrawers.end(), 
-			[pDC] (StreamDirectedDrawer *pd) -> void { pd->Draw(&cu, pDC); });
+			[pDC] (StreamDirectedDrawer *pd) -> void { pd->Draw(&block, pDC); });
 	}
 
 	pDC->Detach();

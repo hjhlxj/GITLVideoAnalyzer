@@ -37,8 +37,7 @@ sysuVideo::BlockSequenceManager::BlockSequenceManager(LPWSTR filepath, CImage *i
 		throw new CFileException(0, -1, filepath);
 
 	imgHeight = imglayer->GetHeight();
-	imgWidth = imglayer->GetWidth();
-	LCUSIZE = 64;
+	imgWidth = imglayer->GetWidth();	
 	splitFlags = new BYTE[(imglayer->GetWidth() / LCUSIZE + 1) * (imglayer->GetHeight() / LCUSIZE + 1) * 4]; 
 	seqCursor = 0;
 }
@@ -76,16 +75,16 @@ void sysuVideo::BlockSequenceManager::BuildIndex()
 	indexSize = blockIndex.size();
 }
 
-BOOL sysuVideo::BlockSequenceManager::GetNextBlock(RECT *cu)
+BOOL sysuVideo::BlockSequenceManager::GetNextBlock(ImgBlcok *block)
 {
-	if (cu == NULL)
+	if (block == NULL)
 		return FALSE;
 
 	if (seqCursor >= seqSize)		//Reach the end of block sequence of the current frame
 		if (!Locale(indexCursor + 1))	//Get the cu blocks for the next frame
 			return FALSE;
 	
-	*cu = blockSeq[seqCursor++];
+	*block = blockSeq[seqCursor++];
 	return TRUE;
 }
 
@@ -111,6 +110,7 @@ void sysuVideo::BlockSequenceManager::updateBlockSequence()
 {
 	static RECT curCU;
 	static std::stack<RECT> CUs;
+	static ImgBlcok ib;
 
 	curLCU.left = -LCUSIZE;
 	curLCU.top = curLCU.right = 0;
@@ -124,13 +124,18 @@ void sysuVideo::BlockSequenceManager::updateBlockSequence()
 		
 		while (!CUs.empty())
 		{
-			curCU = CUs.top();
-			blockSeq.push_back(curCU);
+			curCU = CUs.top();			
+			ib.type = 1 == CUs.size() ? IMGBLOCKTYPE::LCU : IMGBLOCKTYPE::CU;
+			ib.area = curCU;
+			blockSeq.push_back(ib);
 			CUs.pop();
+			
 			if (splitContinue(&curCU))
 			{
 				splitCU(curCU, CUs);
-			}			
+			}
+			
+			appendPUsOfCurCU(&curCU);
 		}
 	}
 
@@ -175,7 +180,7 @@ BOOL sysuVideo::BlockSequenceManager::getNextLCU(RECT *lcu)
 	return TRUE;
 }
 
-BOOL sysuVideo::BlockSequenceManager::splitContinue(RECT * cub)
+BOOL sysuVideo::BlockSequenceManager::splitContinue(RECT *cub)
 {
 	static int times = 0;
 
@@ -228,4 +233,139 @@ void sysuVideo::BlockSequenceManager::localeCUInfo(void)
 	}	
 
 	sfcursor = 0;
+}
+
+BOOL sysuVideo::BlockSequenceManager::isLCU(RECT *cu)
+{
+	return LCUSIZE == (cu->bottom - cu->top) && LCUSIZE == (cu->right - cu->left);
+}
+
+void sysuVideo::BlockSequenceManager::appendPUsOfCurCU(RECT *cu)
+{
+	static RECT subRect;
+	static ImgBlcok ib;
+
+	ib.type = IMGBLOCKTYPE::PU;
+
+	switch (splitFlags[sfcursor])
+	{
+	case PartSize::SIZE_2Nx2N:
+		break;	// no split
+
+	case PartSize::SIZE_NxN:
+		//Bottom right
+		subRect.top = (cu->top + cu->bottom) / 2;
+		subRect.left = (cu->right + cu->left) / 2;
+		subRect.right = cu->right;
+		subRect.bottom = cu->bottom;
+		ib.area = subRect;
+		blockSeq.push_back(ib);
+
+		//Bottom left
+		subRect.right = subRect.left;
+		subRect.left = cu->left;
+		ib.area = subRect;
+		blockSeq.push_back(ib);
+
+		//Top right
+		subRect.bottom = subRect.top;
+		subRect.top = cu->top;
+		subRect.left = subRect.right;
+		subRect.right = cu->right;
+		ib.area = subRect;
+		blockSeq.push_back(ib);
+
+		//Top left
+		subRect.right = subRect.left;
+		subRect.left = cu->left;
+		ib.area = subRect;
+		blockSeq.push_back(ib);
+		break;
+
+	case PartSize::SIZE_2NxN:
+		subRect.top = cu->top;
+		subRect.right = cu->right;
+		subRect.bottom = (cu->bottom + cu->top) / 2;
+		subRect.left = cu->left;
+		ib.area = subRect;
+		blockSeq.push_back(ib);
+		subRect.top = subRect.bottom;
+		subRect.bottom = cu->bottom;
+		blockSeq.push_back(ib);
+		break;
+	
+	case PartSize::SIZE_Nx2N:
+		subRect.top = cu->top;
+		subRect.right = (cu->right + cu->left) / 2;
+		subRect.bottom = cu->bottom;
+		subRect.left = cu->left;
+		ib.area = subRect;
+		blockSeq.push_back(ib);
+		subRect.left = subRect.right;
+		subRect.right = cu->right;
+		blockSeq.push_back(ib);
+		break;
+
+#if AMP
+	case PartSize::SIZE_2NxnU:			// vertical upper segmentation
+		//Upper middle horizontal
+		subRect.top = cu->top;
+		subRect.right = cu->right;
+		subRect.left = cu->left;
+		subRect.bottom = cu->top + (cu->bottom - cu->top) / 4;
+		ib.area = subRect;
+		blockSeq.push_back(ib);
+		subRect.top = subRect.bottom;
+		subRect.bottom = cu->bottom;
+		ib.area = subRect;
+		blockSeq.push_back(ib);
+		break;
+
+	case SIZE_2NxnD:			// vertical lower segmentation
+		//Lower middle horizontal
+		subRect.top = cu->top;
+		subRect.right = cu->right;
+		subRect.left = cu->left;
+		subRect.bottom = cu->bottom - (cu->bottom - cu->top) / 4;
+		ib.area = subRect;
+		blockSeq.push_back(ib);
+		subRect.top = subRect.bottom;
+		subRect.bottom = cu->bottom;
+		ib.area = subRect;
+		blockSeq.push_back(ib);
+		break;
+		break;
+
+	case SIZE_nLx2N:			// horizontal upper segmentation
+		//Upper middle vertical
+		subRect.top = cu->top;
+		subRect.right = cu->left + (cu->right - cu->left) / 4;
+		subRect.left = cu->left;
+		subRect.bottom = cu->bottom;
+		ib.area = subRect;
+		blockSeq.push_back(ib);
+		subRect.left = subRect.right;
+		subRect.right = cu->right;
+		ib.area = subRect;
+		blockSeq.push_back(ib);
+		break;
+
+	case SIZE_nRx2N:			// horizontal lower segmentation
+		//Lower middle vertical
+		subRect.top = cu->top;
+		subRect.right = cu->right - (cu->right - cu->left) / 4;
+		subRect.left = cu->left;
+		subRect.bottom = cu->bottom;
+		ib.area = subRect;
+		blockSeq.push_back(ib);
+		subRect.left = subRect.right;
+		subRect.right = cu->right;
+		ib.area = subRect;
+		blockSeq.push_back(ib);
+		break;
+#endif
+
+	default:
+		break;
+	}
 }

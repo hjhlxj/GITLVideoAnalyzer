@@ -69,6 +69,15 @@
     <ClInclude Include="CUDrawer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MVDrawer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PUDrawer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AuxTypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GITLVideoAnalyser.cpp">
@@ -117,6 +126,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CUDrawer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MVDrawer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PUDrawer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

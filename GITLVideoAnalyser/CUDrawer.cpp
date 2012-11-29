@@ -69,15 +69,17 @@ void sysuVideo::CUDrawer::Locale(unsigned long index)
 	curWorkingFrm = index;
 }
 
-void sysuVideo::CUDrawer::Draw(RECT *cu, CDC *pDC)
+void sysuVideo::CUDrawer::Draw(ImgBlcok *block, CDC *pDC)
 {
 	static CPen *oldPen;
 	static RECT curCU;
+	static RECT *cu;
 
-	if (!enable)
+	if (!enable || IMGBLOCKTYPE::CU != block->type || IMGBLOCKTYPE::LCU != block->type)
 		return;
 	
 	oldPen = pDC->SelectObject(&pen);
+	cu = &(block->area);
 
 	if (dfOffset >= dfSize)
 		readNextLCUDrawingFlag();

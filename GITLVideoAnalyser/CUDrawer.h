@@ -11,17 +11,15 @@ namespace sysuVideo
 		CUDrawer(void);
 		~CUDrawer(void);
 
-		void Draw(RECT *, CDC *) override;
+		void Draw(ImgBlcok *, CDC *) override;
 		void BuildIndex() override;
 		void Locale(unsigned long) override;
-
-	protected:
 		void Init(LPWSTR /* Filepath */) override;
 
-	private:	//Auxiliary operations
+	protected:	//Auxiliary operations
 		void readNextLCUDrawingFlag();
 
-	private:
+	protected:
 		unsigned long indexSize;
 		std::vector<unsigned long> streamIndex;
 

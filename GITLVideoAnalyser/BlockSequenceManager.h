@@ -3,17 +3,18 @@
 #include <vector>
 
 namespace sysuVideo
-{
+{	
 	class BlockSequenceManager
 	{
-	public:
+	public:		
 		explicit BlockSequenceManager(LPWSTR /* Block(CU) sequence file */, CImage * /* Image layer */);
 		~BlockSequenceManager(void);
 
 	public:
-		BOOL GetNextBlock(RECT * /* Block container */);
+		BOOL GetNextBlock(ImgBlcok * /* Block container */);
 		void BuildIndex();
 		BOOL Locale(unsigned long /* #frame */);
+		BOOL isLCU(RECT * /* CU */);
 
 	private:	//Auxiliary functions
 		void updateBlockSequence();
@@ -21,6 +22,10 @@ namespace sysuVideo
 		BOOL splitContinue(RECT * /* CU */);
 		BOOL reachAtomicSize(RECT * /* CU block */);
 		void localeCUInfo(void);
+		void appendPUsOfCurCU(RECT * /* CU */);
+
+		BlockSequenceManager(const BlockSequenceManager&) {};
+		BlockSequenceManager &operator=(const BlockSequenceManager&) {};
 
 	private:
 		FILE *blockStream;
@@ -28,13 +33,12 @@ namespace sysuVideo
 		unsigned long indexSize;
 		unsigned long indexCursor;
 		
-		std::vector<RECT> blockSeq;
+		std::vector<ImgBlcok> blockSeq;
 		unsigned long seqSize;
 		unsigned long seqCursor;
 
 		//split related variables
 		RECT curLCU;
-		int LCUSIZE;
 		int imgWidth;
 		int imgHeight;
 		LPBYTE splitFlags;

@@ -24,6 +24,10 @@ namespace sysuVideo
 		virtual void SetPenWidth(int);
 		virtual void SetPenStyle(int);
 
+	private:
+		ImageDecorator(const ImageDecorator&) {}
+		ImageDecorator &operator=(const ImageDecorator&) {}
+
 	protected: 
 		int penStyle;
 		int penWidth;

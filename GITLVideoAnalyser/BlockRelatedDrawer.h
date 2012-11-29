@@ -7,11 +7,6 @@
 
 namespace sysuVideo
 {
-	enum DRAWERTYPE{
-		CUDRAWER = 0,
-		MVDRAWER
-	};
-
 	class BlockRelatedDrawer :
 		public sysuVideo::ImageDecorator
 	{

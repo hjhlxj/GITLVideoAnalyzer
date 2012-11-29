@@ -35,17 +35,20 @@ int sysuVideo::StreamDirectedDrawer::GetPenStyle() const
 	return penStyle;
 }
 
-void sysuVideo::StreamDirectedDrawer::SetPenColor(COLORREF c) 
+BOOL sysuVideo::StreamDirectedDrawer::SetPenColor(COLORREF c) 
 {
-	penColor = c;
+	penColor = c;	
+	return pen.DeleteObject() && pen.CreatePen(penStyle, penWidth, penColor);
 }
 
-void sysuVideo::StreamDirectedDrawer::SetPenWidth(int pw)  
+BOOL sysuVideo::StreamDirectedDrawer::SetPenWidth(int pw)  
 {
 	penWidth = pw;
+	return pen.DeleteObject() && pen.CreatePen(penStyle, penWidth, penColor);
 }
 
-void sysuVideo::StreamDirectedDrawer::SetPenStyle(int ps)
+BOOL sysuVideo::StreamDirectedDrawer::SetPenStyle(int ps)
 {
 	penStyle = ps;
+	return pen.DeleteObject() && pen.CreatePen(penStyle, penWidth, penColor);
 }

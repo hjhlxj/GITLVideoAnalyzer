@@ -18,6 +18,7 @@ namespace sysuVideo
 		const CImage& GetNthFrame();
 		BOOL HasNextFrame() const;
 		BOOL HasPreviousFrame() const;
+		BOOL HasNthFrame(unsigned long) const;
 		unsigned long GetFrameCount() const;
 		unsigned long GetCurrentFrameCount() const;
 		int GetVideoWidth() const;

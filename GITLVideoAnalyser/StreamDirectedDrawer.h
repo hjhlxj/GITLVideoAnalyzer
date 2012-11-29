@@ -1,7 +1,7 @@
 #pragma once
 
 namespace sysuVideo
-{
+{	
 	class StreamDirectedDrawer
 	{
 	public:
@@ -9,7 +9,7 @@ namespace sysuVideo
 		virtual ~StreamDirectedDrawer(void);
 
 	public:
-		virtual void Draw(RECT * /* block */, CDC * /* Device context of the image layer */) = 0; 
+		virtual void Draw(ImgBlcok * /* block */, CDC * /* Device context of the image layer */) = 0; 
 		virtual void Disable(BOOL /* flag */);
 		virtual void Locale(unsigned long /* #frame */) = 0;
 		virtual void Init(LPWSTR /* filepath */) = 0;
@@ -19,9 +19,9 @@ namespace sysuVideo
 		virtual COLORREF GetPenColor() const;
 		virtual int GetPenWidth() const;
 		virtual int GetPenStyle() const;
-		virtual void SetPenColor(COLORREF);
-		virtual void SetPenWidth(int);
-		virtual void SetPenStyle(int);
+		virtual BOOL SetPenColor(COLORREF);
+		virtual BOOL SetPenWidth(int);
+		virtual BOOL SetPenStyle(int);
 		
 	protected:	//Auxiliary
 		virtual void BuildIndex() = 0;
