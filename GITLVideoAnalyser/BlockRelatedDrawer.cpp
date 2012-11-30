@@ -14,7 +14,7 @@ sysuVideo::BlockRelatedDrawer::BlockRelatedDrawer(CImage *ci)
 	(**(drawers.rbegin())).Init(_T("d:/master/rc/decoder_cupu.txt"));
 	drawers.push_back(new PUDrawer());
 	(**(drawers.rbegin())).Init(_T("d:/master/rc/decoder_cupu.txt"));
-	bsmgr = new BlockSequenceManager(_T("d:/master/cu.txt"), ci);
+	bsmgr = new BlockSequenceManager(_T("d:/master/rc/decoder_cupu.txt"), ci);
 	bsmgr->BuildIndex();
 	
 	for (StreamDirectedDrawer *sdd : drawers)

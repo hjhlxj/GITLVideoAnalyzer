@@ -111,6 +111,7 @@ void sysuVideo::BlockSequenceManager::updateBlockSequence()
 	static RECT curCU;
 	static std::stack<RECT> CUs;
 	static ImgBlcok ib;
+	static BOOL lcuFlag;
 
 	curLCU.left = -LCUSIZE;
 	curLCU.top = curLCU.right = 0;
@@ -121,11 +122,13 @@ void sysuVideo::BlockSequenceManager::updateBlockSequence()
 	while (getNextLCU(&curCU))
 	{
 		CUs.push(curCU);
-		
+		lcuFlag = TRUE;
+
 		while (!CUs.empty())
 		{
 			curCU = CUs.top();			
-			ib.type = 1 == CUs.size() ? IMGBLOCKTYPE::LCU : IMGBLOCKTYPE::CU;
+			ib.type = lcuFlag ? IMGBLOCKTYPE::LCU : IMGBLOCKTYPE::CU;
+			lcuFlag = FALSE;
 			ib.area = curCU;
 			blockSeq.push_back(ib);
 			CUs.pop();
@@ -145,6 +148,11 @@ void sysuVideo::BlockSequenceManager::updateBlockSequence()
 
 BOOL sysuVideo::BlockSequenceManager::getNextLCU(RECT *lcu)
 {		
+	/*static int x = 0;
+	
+	if (x++ > 0)
+		return FALSE;*/
+
 	curLCU.left += LCUSIZE;
 
 	if (curLCU.left >= imgWidth)
@@ -195,7 +203,7 @@ BOOL sysuVideo::BlockSequenceManager::splitContinue(RECT *cub)
 	}
 	else
 	{
-		return splitFlags[sfcursor++] == 99;
+		return 99 == splitFlags[sfcursor++];
 	}
 }
 
@@ -247,7 +255,7 @@ void sysuVideo::BlockSequenceManager::appendPUsOfCurCU(RECT *cu)
 
 	ib.type = IMGBLOCKTYPE::PU;
 
-	switch (splitFlags[sfcursor])
+	switch (splitFlags[sfcursor - 1])
 	{
 	case PartSize::SIZE_2Nx2N:
 		break;	// no split

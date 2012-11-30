@@ -75,7 +75,7 @@ void sysuVideo::CUDrawer::Draw(ImgBlcok *block, CDC *pDC)
 	static RECT curCU;
 	static RECT *cu;
 
-	if (!enable || IMGBLOCKTYPE::CU != block->type || IMGBLOCKTYPE::LCU != block->type)
+	if (!enable || (IMGBLOCKTYPE::CU != block->type && IMGBLOCKTYPE::LCU != block->type))
 		return;
 	
 	oldPen = pDC->SelectObject(&pen);
@@ -84,7 +84,7 @@ void sysuVideo::CUDrawer::Draw(ImgBlcok *block, CDC *pDC)
 	if (dfOffset >= dfSize)
 		readNextLCUDrawingFlag();
 
-	if (drawFlag[dfOffset++] == 99)	//Split need
+	if (99 == drawFlag[dfOffset++])	//Split need
 	{		
 		//Middle vertical
 		pDC->MoveTo((cu->left + cu->right) / 2, cu->top);
@@ -95,21 +95,24 @@ void sysuVideo::CUDrawer::Draw(ImgBlcok *block, CDC *pDC)
 		pDC->LineTo(cu->right, (cu->top + cu->bottom) / 2);
 	}
 
-	//Left vertical
-	pDC->MoveTo(cu->left, cu->top);
-	pDC->LineTo(cu->left, cu->bottom);
+	if (IMGBLOCKTYPE::LCU == block->type)	// Draw the outline for the lcu
+	{
+		//Left vertical
+		pDC->MoveTo(cu->left, cu->top);
+		pDC->LineTo(cu->left, cu->bottom);
 
-	//Right vertical
-	/*pDC->MoveTo(cu->right, cu->top);
-	pDC->LineTo(cu->right, cu->bottom);*/
+		//Right vertical
+		/*pDC->MoveTo(cu->right, cu->top);
+		pDC->LineTo(cu->right, cu->bottom);*/
 
-	//Top horizontal
-	pDC->MoveTo(cu->left, cu->top);
-	pDC->LineTo(cu->right, cu->top);
+		//Top horizontal
+		pDC->MoveTo(cu->left, cu->top);
+		pDC->LineTo(cu->right, cu->top);
 
-	//Bottom horizontal
-	/*pDC->MoveTo(cu->left, cu->bottom);
-	pDC->LineTo(cu->right, cu->bottom);*/
+		//Bottom horizontal
+		/*pDC->MoveTo(cu->left, cu->bottom);
+		pDC->LineTo(cu->right, cu->bottom);*/
+	}
 
 	pDC->SelectObject(oldPen);
 }

@@ -26,17 +26,37 @@ void sysuVideo::MVDrawer::Init(LPWSTR filepath)
 	BuildIndex();
 }
 
-void sysuVideo::MVDrawer::Draw(ImgBlcok *cu, CDC *pDC)
+void sysuVideo::MVDrawer::Draw(ImgBlcok *block, CDC *pDC)
 {
 	static CPen *oldPen;
 	static RECT curCU;
+	static POINT mv;
 
 	if (!enable)
 		return;
 	
 	oldPen = pDC->SelectObject(&pen);
 
+	if (IMGBLOCKTYPE::CU != block->type || IMGBLOCKTYPE::PU != block->type)
+		return;			// Motion vector is for PU only
 
+	switch (pPUVectors[++pVOffset])
+	{
+	case 0:
+		break;
+
+	case 1:
+	case 2:
+		mv.x = pPUVectors[++pVOffset];
+		mv.y = pPUVectors[++pVOffset];
+		break;
+
+	case 3:
+		break;
+
+	default:
+		break;
+	}
 
 	pDC->SelectObject(oldPen);
 }
@@ -99,7 +119,7 @@ void sysuVideo::MVDrawer::getMVsForNextLCU()
 	while (token != NULL && *token != '\n')
 	{		
 		tmp = atoi(token);
-		pLCUVectors[pVSize] = (short)tmp;
+		pPUVectors[pVSize] = (short)tmp;
 		++pVSize;
 		token = strtok_s(NULL, " ", &nextToken);
 	}	

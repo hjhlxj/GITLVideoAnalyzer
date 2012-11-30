@@ -28,7 +28,7 @@ namespace sysuVideo
 
 		unsigned long curWorkingFrm;
 
-		short *pLCUVectors;
+		short *pPUVectors;
 		int pVSize;
 		int pVOffset;
 	};
