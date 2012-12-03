@@ -13,7 +13,8 @@ sysuVideo::GITLVideoAnalyzer::~GITLVideoAnalyzer(void)
 
 const CImage& sysuVideo::GITLVideoAnalyzer::GetCurrentFrame() const
 {
-	CImage c;
+	const CImage &c = pVReader->GetCurFrame();
+
 	return c;
 }
 

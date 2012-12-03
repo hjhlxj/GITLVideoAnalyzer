@@ -18,6 +18,8 @@ namespace sysuVideo
 
 	private:
 		void getMVsForNextLCU();
+		void drawVector(RECT * /* Area */, POINT /* Coordinate */, CDC * /* Pointer to the device context */);
+		POINT lpToDp(RECT * /* Reference pu */, POINT& /* logical origin */, POINT & /* Logical Point */);
 
 	protected:	//Auxiliary
 		virtual void BuildIndex() override;

@@ -4,7 +4,7 @@
 
 sysuVideo::PUDrawer::PUDrawer(void)
 {
-	SetPenColor(RGB(255, 0, 0));
+	SetPenColor(RGB(255, 255, 255));
 }
 
 
@@ -21,14 +21,18 @@ void sysuVideo::PUDrawer::Draw(ImgBlcok *block, CDC *pDC)
 	if (dfOffset >= dfSize)
 		readNextLCUDrawingFlag();
 
-	if (!enable || IMGBLOCKTYPE::PU != block->type)
+	if (!enable || (IMGBLOCKTYPETAG::PU_HORZ_SPLIT != block->type &&
+		IMGBLOCKTYPETAG::PU_VERT_SPLIT != block->type && 
+		IMGBLOCKTYPETAG::ACTOMIC_BLOCK != block->type &&
+		IMGBLOCKTYPETAG::PU_QUARTILE_SPLIT != block->type))
 	{
-		++dfOffset;
+		//++dfOffset;
 		return;		// skip non-PU drawing
 	}
 
 	oldPen = pDC->SelectObject(&pen);
 	cu = &(block->area);	
+
 	pDC->MoveTo(cu->left, cu->top);
 	pDC->LineTo(cu->right, cu->top);
 

@@ -24,7 +24,7 @@ namespace sysuVideo
 		std::vector<unsigned long> streamIndex;
 
 		unsigned long curWorkingFrm;
-		BYTE drawFlag[1000];	//Per-LCU drawing info
+		LPBYTE drawFlag;	//Per-LCU drawing info
 		int dfSize;				//drawFlag size
 		int dfOffset;			//drawFlag offset
 	};

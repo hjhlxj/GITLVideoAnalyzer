@@ -109,9 +109,8 @@ BOOL sysuVideo::BlockSequenceManager::Locale(unsigned long frmIndex)
 void sysuVideo::BlockSequenceManager::updateBlockSequence()
 {
 	static RECT curCU;
-	static std::stack<RECT> CUs;
+	static std::stack<RECT> Blocks;
 	static ImgBlcok ib;
-	static BOOL lcuFlag;
 
 	curLCU.left = -LCUSIZE;
 	curLCU.top = curLCU.right = 0;
@@ -121,24 +120,26 @@ void sysuVideo::BlockSequenceManager::updateBlockSequence()
 
 	while (getNextLCU(&curCU))
 	{
-		CUs.push(curCU);
-		lcuFlag = TRUE;
+		Blocks.push(curCU);
 
-		while (!CUs.empty())
+		while (!Blocks.empty())
 		{
-			curCU = CUs.top();			
-			ib.type = lcuFlag ? IMGBLOCKTYPE::LCU : IMGBLOCKTYPE::CU;
-			lcuFlag = FALSE;
-			ib.area = curCU;
-			blockSeq.push_back(ib);
-			CUs.pop();
+			curCU = Blocks.top();			
+			Blocks.pop();
 			
 			if (splitContinue(&curCU))
 			{
-				splitCU(curCU, CUs);
+				ib.type = (IMGBLOCKTYPETAG)getCurrentSplitFlag();
+				ib.area = curCU;			
+				blockSeq.push_back(ib);
+				splitCU(curCU, Blocks);
 			}
-			
-			appendPUsOfCurCU(&curCU);
+			else
+			{
+				appendPUsOfCurCU(&curCU);
+			}
+
+			++sfcursor;
 		}
 	}
 
@@ -183,9 +184,9 @@ BOOL sysuVideo::BlockSequenceManager::getNextLCU(RECT *lcu)
 	curLCU.right = min(curLCU.right, imgWidth);
 	*lcu = curLCU;
 
-	localeCUInfo();	//Locale the stream to the current LCU split information line
-
-	return TRUE;
+	if (localeCUInfo())	//Locale the stream to the current LCU split information line
+		return TRUE;
+	else return FALSE;
 }
 
 BOOL sysuVideo::BlockSequenceManager::splitContinue(RECT *cub)
@@ -199,12 +200,21 @@ BOOL sysuVideo::BlockSequenceManager::splitContinue(RECT *cub)
 	}
 	else if (sfcursor >= sflength)
 	{
+		MessageBox(NULL, _T("sfcursor >= sflength exec"), _T("oops!"), MB_OK);
 		return FALSE;
 	}
 	else
 	{
-		return 99 == splitFlags[sfcursor++];
+		return IMGBLOCKTYPETAG::CU_SPLIT == splitFlags[sfcursor];
 	}
+}
+
+BYTE sysuVideo::BlockSequenceManager::getCurrentSplitFlag() const
+{
+	if (sfcursor < sflength)
+		return splitFlags[sfcursor];
+	else
+		return -1;
 }
 
 BOOL sysuVideo::BlockSequenceManager::reachAtomicSize(RECT *cub)
@@ -212,7 +222,7 @@ BOOL sysuVideo::BlockSequenceManager::reachAtomicSize(RECT *cub)
 	return abs((cub->right - cub->left)) < (LCUSIZE / 4 / 4);	//Recursive depth is 4
 }
 
-void sysuVideo::BlockSequenceManager::localeCUInfo(void)
+BOOL sysuVideo::BlockSequenceManager::localeCUInfo(void)
 {
 	static const int bufsize = 1024 * 3;
 	static char buf[bufsize];	//3K buffer
@@ -228,7 +238,7 @@ void sysuVideo::BlockSequenceManager::localeCUInfo(void)
 	if (frmCnt != curWorkingFrame)
 	{
 		sflength = sfcursor = 0;
-		return;
+		return FALSE;
 	}
 
 	token = strtok_s(NULL, " ", &nextToken);
@@ -241,6 +251,7 @@ void sysuVideo::BlockSequenceManager::localeCUInfo(void)
 	}	
 
 	sfcursor = 0;
+	return TRUE;
 }
 
 BOOL sysuVideo::BlockSequenceManager::isLCU(RECT *cu)
@@ -252,15 +263,17 @@ void sysuVideo::BlockSequenceManager::appendPUsOfCurCU(RECT *cu)
 {
 	static RECT subRect;
 	static ImgBlcok ib;
-
-	ib.type = IMGBLOCKTYPE::PU;
-
-	switch (splitFlags[sfcursor - 1])
+	
+	switch (splitFlags[sfcursor])
 	{
 	case PartSize::SIZE_2Nx2N:
+		ib.type = IMGBLOCKTYPETAG::ACTOMIC_BLOCK;
+		ib.area = *cu;
+		blockSeq.push_back(ib);
 		break;	// no split
 
 	case PartSize::SIZE_NxN:
+		ib.type = IMGBLOCKTYPETAG::PU_QUARTILE_SPLIT;
 		//Bottom right
 		subRect.top = (cu->top + cu->bottom) / 2;
 		subRect.left = (cu->right + cu->left) / 2;
@@ -291,6 +304,7 @@ void sysuVideo::BlockSequenceManager::appendPUsOfCurCU(RECT *cu)
 		break;
 
 	case PartSize::SIZE_2NxN:
+		ib.type = IMGBLOCKTYPETAG::PU_HORZ_SPLIT;
 		subRect.top = cu->top;
 		subRect.right = cu->right;
 		subRect.bottom = (cu->bottom + cu->top) / 2;
@@ -303,6 +317,7 @@ void sysuVideo::BlockSequenceManager::appendPUsOfCurCU(RECT *cu)
 		break;
 	
 	case PartSize::SIZE_Nx2N:
+		ib.type = IMGBLOCKTYPETAG::PU_VERT_SPLIT;
 		subRect.top = cu->top;
 		subRect.right = (cu->right + cu->left) / 2;
 		subRect.bottom = cu->bottom;

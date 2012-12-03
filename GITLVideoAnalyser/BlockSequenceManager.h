@@ -20,8 +20,9 @@ namespace sysuVideo
 		void updateBlockSequence();
 		BOOL getNextLCU(RECT * /* LCU */);
 		BOOL splitContinue(RECT * /* CU */);
+		BYTE getCurrentSplitFlag() const;
 		BOOL reachAtomicSize(RECT * /* CU block */);
-		void localeCUInfo(void);
+		BOOL localeCUInfo(void);
 		void appendPUsOfCurCU(RECT * /* CU */);
 
 		BlockSequenceManager(const BlockSequenceManager&) {};

@@ -2,6 +2,7 @@
 #include "BlockRelatedDrawer.h"
 #include "CUDrawer.h"
 #include "PUDrawer.h"
+#include "MVDrawer.h"
 #include <cstdarg>
 #include <stack>
 #include <algorithm>
@@ -10,10 +11,16 @@ sysuVideo::BlockRelatedDrawer::BlockRelatedDrawer(CImage *ci)
 {
 	imgBase = ci;
 	imgLayout.Create(ci->GetWidth(), ci->GetHeight(), 32, CImage::createAlphaChannel);
+	
 	drawers.push_back(new CUDrawer());
 	(**(drawers.rbegin())).Init(_T("d:/master/rc/decoder_cupu.txt"));
+	
 	drawers.push_back(new PUDrawer());
 	(**(drawers.rbegin())).Init(_T("d:/master/rc/decoder_cupu.txt"));
+	
+	drawers.push_back(new MVDrawer());
+	(**(drawers.rbegin())).Init(_T("d:/master/rc/decoder_mv.txt"));
+
 	bsmgr = new BlockSequenceManager(_T("d:/master/rc/decoder_cupu.txt"), ci);
 	bsmgr->BuildIndex();
 	
@@ -41,6 +48,10 @@ void sysuVideo::BlockRelatedDrawer::Decorate(void *img, ...)
 
 	va_start(ap, img);
 	targetFrame = va_arg(ap, int);
+
+	/*if (targetFrame != 9)
+		return ;*/
+
 	workingFrameCnt = targetFrame;
 
 	drawBlockInfo();

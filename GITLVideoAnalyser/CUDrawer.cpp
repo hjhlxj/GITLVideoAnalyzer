@@ -8,13 +8,17 @@ sysuVideo::CUDrawer::CUDrawer(void)
 
 	penWidth = 1;
 	penStyle = PS_DASHDOTDOT;
-	penColor = RGB(255, 255, 255);
+	penColor = RGB(255, 0, 0);
 	pen.CreatePen(penStyle, penWidth, penColor);
+
+	drawFlag = new BYTE[1000];
 }
 
 
 sysuVideo::CUDrawer::~CUDrawer(void)
 {
+	if (nullptr != drawFlag)
+		delete [] drawFlag;
 }
 
 void sysuVideo::CUDrawer::Init(LPWSTR filepath)
@@ -75,46 +79,63 @@ void sysuVideo::CUDrawer::Draw(ImgBlcok *block, CDC *pDC)
 	static RECT curCU;
 	static RECT *cu;
 
-	if (!enable || (IMGBLOCKTYPE::CU != block->type && IMGBLOCKTYPE::LCU != block->type))
+	if (!enable || IMGBLOCKTYPETAG::CU_SPLIT != block->type)
 		return;
 	
 	oldPen = pDC->SelectObject(&pen);
 	cu = &(block->area);
 
-	if (dfOffset >= dfSize)
-		readNextLCUDrawingFlag();
+	//Middle vertical
+	pDC->MoveTo((cu->left + cu->right) / 2, cu->top);
+	pDC->LineTo((cu->left + cu->right) / 2, cu->bottom); 
 
-	if (99 == drawFlag[dfOffset++])	//Split need
-	{		
-		//Middle vertical
-		pDC->MoveTo((cu->left + cu->right) / 2, cu->top);
-		pDC->LineTo((cu->left + cu->right) / 2, cu->bottom); 
+	//Middle horizontal
+	pDC->MoveTo(cu->left, (cu->top + cu->bottom) / 2);
+	pDC->LineTo(cu->right, (cu->top + cu->bottom) / 2);
 
-		//Middle horizontal
-		pDC->MoveTo(cu->left, (cu->top + cu->bottom) / 2);
-		pDC->LineTo(cu->right, (cu->top + cu->bottom) / 2);
-	}
+	//Left vertical
+	pDC->MoveTo(cu->left, cu->top);
+	pDC->LineTo(cu->left, cu->bottom);
 
-	if (IMGBLOCKTYPE::LCU == block->type)	// Draw the outline for the lcu
-	{
-		//Left vertical
-		pDC->MoveTo(cu->left, cu->top);
-		pDC->LineTo(cu->left, cu->bottom);
-
-		//Right vertical
-		/*pDC->MoveTo(cu->right, cu->top);
-		pDC->LineTo(cu->right, cu->bottom);*/
-
-		//Top horizontal
-		pDC->MoveTo(cu->left, cu->top);
-		pDC->LineTo(cu->right, cu->top);
-
-		//Bottom horizontal
-		/*pDC->MoveTo(cu->left, cu->bottom);
-		pDC->LineTo(cu->right, cu->bottom);*/
-	}
+	//Top horizontal
+	pDC->MoveTo(cu->left, cu->top);
+	pDC->LineTo(cu->right, cu->top);
 
 	pDC->SelectObject(oldPen);
+
+	//if (dfOffset >= dfSize)
+	//	readNextLCUDrawingFlag();
+
+	//if (99 == drawFlag[dfOffset++])	//Split need
+	//{		
+	//	//Middle vertical
+	//	pDC->MoveTo((cu->left + cu->right) / 2, cu->top);
+	//	pDC->LineTo((cu->left + cu->right) / 2, cu->bottom); 
+
+	//	//Middle horizontal
+	//	pDC->MoveTo(cu->left, (cu->top + cu->bottom) / 2);
+	//	pDC->LineTo(cu->right, (cu->top + cu->bottom) / 2);
+	//}
+
+	//if (IMGBLOCKTYPE::CU != block->type)	// Draw the outline for the lcu
+	//{
+	//	//Left vertical
+	//	pDC->MoveTo(cu->left, cu->top);
+	//	pDC->LineTo(cu->left, cu->bottom);
+
+	//	//Right vertical
+	//	/*pDC->MoveTo(cu->right, cu->top);
+	//	pDC->LineTo(cu->right, cu->bottom);*/
+
+	//	//Top horizontal
+	//	pDC->MoveTo(cu->left, cu->top);
+	//	pDC->LineTo(cu->right, cu->top);
+
+	//	//Bottom horizontal
+	//	/*pDC->MoveTo(cu->left, cu->bottom);
+	//	pDC->LineTo(cu->right, cu->bottom);*/
+	//}
+
 }
 
 void sysuVideo::CUDrawer::readNextLCUDrawingFlag()
@@ -130,6 +151,13 @@ void sysuVideo::CUDrawer::readNextLCUDrawingFlag()
 	token = strtok_s(buf, " ", &nextToken);
 	sscanf_s(token, "<%lu,%lu>", &frmCnt, &curFrm);
 	dfSize = 0;
+
+	if (frmCnt != curWorkingFrm)
+	{
+		TCHAR sb[100];
+		swprintf_s(sb, _T("curFrm %d, working Frm %d"), frmCnt, curWorkingFrm);
+		MessageBox(NULL, sb, _T("CU"), MB_OK);
+	}
 
 	token = strtok_s(NULL, " ", &nextToken);
 	while (token != NULL && *token != '\n')
