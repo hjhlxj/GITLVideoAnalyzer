@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "VideoReader.h"
+#include "GITLVideoAnalyzer.h"
 
 class CGITLVideoAnalyserDoc : public CDocument
 {
@@ -15,7 +15,7 @@ protected: // create from serialization only
 
 // Attributes
 public:
-	sysuVideo::VideoReader *videoReader;
+	sysuVideo::GITLVideoAnalyzer gva;
 	BOOL dataReady;
 
 // Operations

@@ -37,6 +37,7 @@ BEGIN_MESSAGE_MAP(ControlDialogBar, CDialogBar)
 	ON_MESSAGE(WM_INITDIALOG, OnInitDialog)
 	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN1, &ControlDialogBar::OnDeltaposSpin1)
 	ON_EN_KILLFOCUS(IDC_EDIT1, &ControlDialogBar::OnEnKillfocusEdit1)
+	ON_EN_CHANGE(IDC_EDIT1, &ControlDialogBar::OnEnChangeEdit1)
 END_MESSAGE_MAP()
 
 
@@ -96,4 +97,23 @@ void ControlDialogBar::SetTotalFrameCnt(unsigned long fcnt)
 {
 	wsprintf(buf, _T("%lu"), fcnt);
 	((CStatic *)GetDlgItem(IDC_STATIC))->SetWindowTextW(buf);
+}
+
+void ControlDialogBar::OnEnChangeEdit1()
+{
+	// TODO:  If this is a RICHEDIT control, the control will not
+	// send this notification unless you override the CDialogBar::OnInitDialog()
+	// function and call CRichEditCtrl().SetEventMask()
+	// with the ENM_CHANGE flag ORed into the mask.
+
+	// TODO:  Add your control notification handler code here
+
+	((CEdit *)GetDlgItem(IDC_EDIT1))->GetWindowTextW(buf, 250);
+	m_edit = StrToIntW(buf);
+	m_edit = max(0, m_edit);
+	m_edit = min(maxFrameCount, m_edit);
+	wsprintfW(buf, _T("%d"), m_edit);
+	
+	((CGITLVideoAnalyserView *)((CMainFrame *)::AfxGetMainWnd())->GetActiveView())->ShowNthFrame(m_edit);
+	//((CEdit *)GetDlgItem(IDC_EDIT1))->SetWindowTextW(buf);
 }

@@ -90,7 +90,7 @@ const CImage& sysuVideo::YUVReader::GetCurFrame()
 	//img->ReleaseDC();
 	//memcpy(img, &frameBuf, sizeof(frameBuf));--
 
-	imgDeco->Decorate(&frameBuf, (int)curFrameCnt);
+	//imgDeco->Decorate(&frameBuf, (int)curFrameCnt);
 	return frameBuf;
 }
 
@@ -102,6 +102,18 @@ const CImage& sysuVideo::YUVReader::GetPreFrame()
 	fseek(videoStream, -2 * (YCount + UCount + VCount), SEEK_CUR);
 	constructFrame();
 	--curFrameCnt;
+
+	return GetCurFrame();
+}
+
+const CImage& sysuVideo::YUVReader::GetNthFrame(unsigned long frmNum)
+{
+	if (!HasNthFrame(frmNum) || !isStreamOpen)
+		throw EXCEPTION_ACCESS_VIOLATION;
+
+	fseek(videoStream, frmNum * (YCount + UCount + VCount), SEEK_SET);
+	constructFrame();
+	curFrameCnt = frmNum;
 
 	return GetCurFrame();
 }
@@ -136,7 +148,7 @@ BOOL sysuVideo::YUVReader::Init(LPVOID initInfo)
 
 	frameCnt = filesize / (YCount + UCount + VCount);
 
-	imgDeco = new BlockRelatedDrawer(&frameBuf);
+	//imgDeco = new BlockRelatedDrawer(&frameBuf);
 
 	curFrameCnt = 0;
 	constructFrame();	//Ready for show
@@ -177,4 +189,9 @@ BOOL sysuVideo::YUVReader::HasNextFrame() const
 BOOL sysuVideo::YUVReader::HasPreFrame() const
 {
 	return curFrameCnt > 0;
+}
+
+BOOL sysuVideo::YUVReader::HasNthFrame(unsigned long frmNum) const
+{
+	return frmNum < frameCnt && frmNum >= 0;
 }

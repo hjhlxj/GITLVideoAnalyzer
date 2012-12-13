@@ -5,8 +5,9 @@
 #pragma once
 
 #include <atlimage.h>
+#include "MemoryDoubleBufferingShower.h"
 
-class CGITLVideoAnalyserView : public CView
+class CGITLVideoAnalyserView : public CScrollView
 {
 protected: // create from serialization only
 	CGITLVideoAnalyserView();
@@ -15,11 +16,20 @@ protected: // create from serialization only
 // Attributes
 public:
 	CGITLVideoAnalyserDoc* GetDocument() const;
-
+	void OnInitialUpdate();
 // Operations
 public:
 	BOOL ShowNextFrame(void);
 	BOOL ShowPreFrame(void);
+	BOOL ShowNthFrame(unsigned long /*#frame*/);
+
+private:
+	CPoint dpZero;		// the begin point of the draw
+	CPoint lbdCapture;	// the point where left button clicks down
+	BOOL isLButtonDown;	// whether the left button is clicked down
+	sysuVideo::MemoryDoubleBufferingShower mdbShower;	// double buffering image-shower
+	int showWidth;
+	int showHeight;
 
 // Overrides
 public:
@@ -43,6 +53,11 @@ protected:
 // Generated message map functions
 protected:
 	DECLARE_MESSAGE_MAP()
+public:
+	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
+	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
+	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
+	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 };
 
 #ifndef _DEBUG  // debug version in GITLVideoAnalyserView.cpp

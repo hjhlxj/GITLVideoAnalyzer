@@ -96,12 +96,11 @@ void CGITLVideoAnalyserDoc::Serialize(CArchive& ar)
 
 		CString filepath = ar.GetFile()->GetFilePath();
 		
-		videoReader = sysuVideo::VideoReaderFactory::GetInstance().GetVideoReader(sysuVideo::VIDEOREADERTYPE::YUVREADER);
+		//videoReader = sysuVideo::VideoReaderFactory::GetInstance().GetVideoReader(sysuVideo::VIDEOREADERTYPE::YUVREADER);
 				
-		videoReader->Init(&filepath);
-
-		dataReady = TRUE;
-
+		//videoReader->Init(&filepath);
+		if (gva.OpenVideoFile(&filepath))
+			dataReady = TRUE;
 	}
 }
 

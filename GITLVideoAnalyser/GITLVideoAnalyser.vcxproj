@@ -120,6 +120,7 @@
     <ClInclude Include="GITLVideoAnalyzer.h" />
     <ClInclude Include="ImageDecorator.h" />
     <ClInclude Include="MainFrm.h" />
+    <ClInclude Include="MemoryDoubleBufferingShower.h" />
     <ClInclude Include="MVDrawer.h" />
     <ClInclude Include="PUDrawer.h" />
     <ClInclude Include="Resource.h" />
@@ -141,6 +142,7 @@
     <ClCompile Include="GITLVideoAnalyzer.cpp" />
     <ClCompile Include="ImageDecorator.cpp" />
     <ClCompile Include="MainFrm.cpp" />
+    <ClCompile Include="MemoryDoubleBufferingShower.cpp" />
     <ClCompile Include="MVDrawer.cpp" />
     <ClCompile Include="PUDrawer.cpp" />
     <ClCompile Include="stdafx.cpp">

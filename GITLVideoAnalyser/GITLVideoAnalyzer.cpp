@@ -1,9 +1,11 @@
 #include "stdafx.h"
 #include "GITLVideoAnalyzer.h"
+#include "BlockRelatedDrawer.h"
 
 
 sysuVideo::GITLVideoAnalyzer::GITLVideoAnalyzer(void)
 {
+	bVideoOpen = bDecoReady = FALSE;
 }
 
 
@@ -13,62 +15,103 @@ sysuVideo::GITLVideoAnalyzer::~GITLVideoAnalyzer(void)
 
 const CImage& sysuVideo::GITLVideoAnalyzer::GetCurrentFrame() const
 {
+	if (!bVideoOpen)
+		throw EXCEPTION_ACCESS_VIOLATION;
+
 	const CImage &c = pVReader->GetCurFrame();
 
+	if (!bDecoReady)
+		return c;
+
+	pImgDeco->Decorate((CImage*)&c, curWorkingFrmNum);
 	return c;
 }
 
 const CImage& sysuVideo::GITLVideoAnalyzer::GetPreviousFrame() 
 {
-	CImage c;
+	if (!bVideoOpen)
+		throw EXCEPTION_ACCESS_VIOLATION;
+
+	if (!pVReader->HasPreFrame())
+		return GetCurrentFrame();
+
+	const CImage& c = pVReader->GetPreFrame();
+	
+	if (!bDecoReady)
+		return c;
+
+	pImgDeco->Decorate((CImage*)&c, --curWorkingFrmNum);
 	return c;
 }
 
 const CImage& sysuVideo::GITLVideoAnalyzer::GetNextFrame() 
 {
-	CImage c;
+	if (!bVideoOpen)
+		throw EXCEPTION_ACCESS_VIOLATION;
+
+	if (!pVReader->HasNextFrame())
+		return GetCurrentFrame();
+
+	const CImage& c = pVReader->GetNextFrame();
+	
+	if (!bDecoReady)
+		return c;
+
+	pImgDeco->Decorate((CImage*)&c, ++curWorkingFrmNum);
 	return c;
 }
 
-const CImage& sysuVideo::GITLVideoAnalyzer::GetNthFrame()
+const CImage& sysuVideo::GITLVideoAnalyzer::GetNthFrame(unsigned long frmNum)
 {
-	CImage c;
+	if (!bVideoOpen)
+		throw EXCEPTION_ACCESS_VIOLATION;
+
+	if (!pVReader->HasNthFrame(frmNum))
+		return GetCurrentFrame();
+
+	const CImage& c = pVReader->GetNthFrame(frmNum);
+	
+	if (!bDecoReady)
+		return c;
+
+	pImgDeco->Decorate((CImage*)&c, frmNum);
+	curWorkingFrmNum = frmNum;
 	return c;
 }
 
 BOOL sysuVideo::GITLVideoAnalyzer::HasNextFrame() const
 {
-	return TRUE;
+	return pVReader->HasNextFrame();
 }
 
 BOOL sysuVideo::GITLVideoAnalyzer::HasPreviousFrame() const
 {
-	return TRUE;
+	return pVReader->HasPreFrame();
 }
 
 BOOL sysuVideo::GITLVideoAnalyzer::HasNthFrame(unsigned long n) const
 {
-	return TRUE;
+	return FALSE;
 }
 
 unsigned long sysuVideo::GITLVideoAnalyzer::GetFrameCount() const
 {
-	return 0;
+	return pVReader->GetFrameCount();
 }
 
 unsigned long sysuVideo::GITLVideoAnalyzer::GetCurrentFrameCount() const
 {
-	return 0;
+	return pVReader->GetCurrentFrameNum();
 }
 
 int sysuVideo::GITLVideoAnalyzer::GetVideoWidth() const
 {
-	return 0;
+	return pVReader->GetWidth();
 }
 
 int sysuVideo::GITLVideoAnalyzer::GetVideoHeight() const
 {
-	return 0;
+	return pVReader->GetHeight();
 }
 
 void sysuVideo::GITLVideoAnalyzer::ShowCU(BOOL flag)
@@ -104,7 +147,17 @@ BOOL sysuVideo::GITLVideoAnalyzer::OpenAnalyticalFile(LPWSTR filepath)
 	return TRUE;
 }
 
-BOOL sysuVideo::GITLVideoAnalyzer::OpenVideoFile(LPWSTR filepath)
+BOOL sysuVideo::GITLVideoAnalyzer::OpenVideoFile(CString *filepath)
 {
-	return TRUE;
+	pVReader = VideoReaderFactory::GetInstance().GetVideoReader(sysuVideo::VIDEOREADERTYPE::YUVREADER);
+	if (pVReader->Init(filepath))
+	{
+		bVideoOpen = TRUE;
+		pImgDeco = new BlockRelatedDrawer((CImage *)&(pVReader->GetCurFrame()));
+		bDecoReady = TRUE;
+		curWorkingFrmNum = 0;
+		return TRUE;
+	}
+	else
+		return FALSE;
 }

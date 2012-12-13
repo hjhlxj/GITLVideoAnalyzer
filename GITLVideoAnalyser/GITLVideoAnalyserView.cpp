@@ -21,13 +21,17 @@
 
 // CGITLVideoAnalyserView
 
-IMPLEMENT_DYNCREATE(CGITLVideoAnalyserView, CView)
+IMPLEMENT_DYNCREATE(CGITLVideoAnalyserView, CScrollView)
 
-BEGIN_MESSAGE_MAP(CGITLVideoAnalyserView, CView)
+BEGIN_MESSAGE_MAP(CGITLVideoAnalyserView, CScrollView)
 	// Standard printing commands
-	ON_COMMAND(ID_FILE_PRINT, &CView::OnFilePrint)
-	ON_COMMAND(ID_FILE_PRINT_DIRECT, &CView::OnFilePrint)
-	ON_COMMAND(ID_FILE_PRINT_PREVIEW, &CView::OnFilePrintPreview)
+	ON_COMMAND(ID_FILE_PRINT, &CScrollView::OnFilePrint)
+	ON_COMMAND(ID_FILE_PRINT_DIRECT, &CScrollView::OnFilePrint)
+	ON_COMMAND(ID_FILE_PRINT_PREVIEW, &CScrollView::OnFilePrintPreview)
+	ON_WM_MOUSEWHEEL()
+	ON_WM_LBUTTONDOWN()
+	ON_WM_LBUTTONUP()
+	ON_WM_MOUSEMOVE()
 END_MESSAGE_MAP()
 
 // CGITLVideoAnalyserView construction/destruction
@@ -36,6 +40,8 @@ CGITLVideoAnalyserView::CGITLVideoAnalyserView()
 {
 	// TODO: add construction code here
 
+	isLButtonDown = FALSE;
+	dpZero.x = dpZero.y = showWidth = showHeight = 0;
 }
 
 CGITLVideoAnalyserView::~CGITLVideoAnalyserView()
@@ -47,7 +53,7 @@ BOOL CGITLVideoAnalyserView::PreCreateWindow(CREATESTRUCT& cs)
 	// TODO: Modify the Window class or styles here by modifying
 	//  the CREATESTRUCT cs
 
-	return CView::PreCreateWindow(cs);
+	return CScrollView::PreCreateWindow(cs);
 }
 
 // CGITLVideoAnalyserView drawing
@@ -63,10 +69,18 @@ void CGITLVideoAnalyserView::OnDraw(CDC* pDC)
 	if (!pDoc->dataReady)
 		return;
 	
-	((CMainFrame *)GetParent())->m_wndToolBox.SetTotalFrameCnt(pDoc->videoReader->GetFrameCount());
+	((CMainFrame *)GetParent())->m_wndToolBox.SetTotalFrameCnt(pDoc->gva.GetFrameCount());
 
-	const CImage& cimg = this->GetDocument()->videoReader->GetCurFrame();
-	cimg.Draw(pDC->m_hDC, 0, 0, cimg.GetWidth(), cimg.GetHeight());
+	const CImage& cimg = this->GetDocument()->gva.GetCurrentFrame();
+
+	if (showWidth <= 0 || showHeight <= 0)
+	{
+		showWidth = cimg.GetWidth();
+		showHeight = cimg.GetHeight();
+	}
+
+	//cimg.Draw(pDC->m_hDC, 0, 0, cimg.GetWidth(), cimg.GetHeight());
+	mdbShower.ShowImage(pDC, dpZero.x, dpZero.y, showWidth, showHeight, cimg);
 }
 
 
@@ -94,12 +108,12 @@ void CGITLVideoAnalyserView::OnEndPrinting(CDC* /*pDC*/, CPrintInfo* /*pInfo*/)
 #ifdef _DEBUG
 void CGITLVideoAnalyserView::AssertValid() const
 {
-	CView::AssertValid();
+	CScrollView::AssertValid();
 }
 
 void CGITLVideoAnalyserView::Dump(CDumpContext& dc) const
 {
-	CView::Dump(dc);
+	CScrollView::Dump(dc);
 }
 
 CGITLVideoAnalyserDoc* CGITLVideoAnalyserView::GetDocument() const // non-debug version is inline
@@ -120,8 +134,9 @@ BOOL CGITLVideoAnalyserView::ShowNextFrame(void)
 	CDC *pDC = this->GetDC();
 	BOOL showStatus = FALSE;
 
-	const CImage& cimg = this->GetDocument()->videoReader->GetNextFrame();
-	cimg.Draw(pDC->m_hDC, 0, 0, cimg.GetWidth(), cimg.GetHeight());
+	const CImage& cimg = this->GetDocument()->gva.GetNextFrame();
+	//cimg.Draw(pDC->m_hDC, dpZero.x, dpZero.y, cimg.GetWidth(), cimg.GetHeight());
+	mdbShower.ShowImage(pDC, dpZero.x, dpZero.y, showWidth, showHeight, cimg);
 	showStatus = TRUE;
 	
 	return showStatus;
@@ -132,9 +147,97 @@ BOOL CGITLVideoAnalyserView::ShowPreFrame(void)
 	CDC *pDC = this->GetDC();
 	BOOL showStatus = FALSE;
 
-	const CImage& cimg = this->GetDocument()->videoReader->GetPreFrame();
-	cimg.Draw(pDC->m_hDC, 0, 0, cimg.GetWidth(), cimg.GetHeight());
+	const CImage& cimg = this->GetDocument()->gva.GetPreviousFrame();
+	//cimg.Draw(pDC->m_hDC, dpZero.x, dpZero.y, cimg.GetWidth(), cimg.GetHeight());
+	mdbShower.ShowImage(pDC, dpZero.x, dpZero.y, showWidth, showHeight, cimg);
 	showStatus = TRUE;
 
 	return showStatus;
+}
+
+BOOL CGITLVideoAnalyserView::ShowNthFrame(unsigned long frmNum)
+{
+	CDC *pDC = this->GetDC();
+	BOOL showStatus = FALSE;
+
+	const CImage& cimg = this->GetDocument()->gva.GetNthFrame(frmNum);
+	//cimg.Draw(pDC->m_hDC, dpZero.x, dpZero.y, cimg.GetWidth(), cimg.GetHeight());
+	mdbShower.ShowImage(pDC, dpZero.x, dpZero.y, showWidth, showHeight, cimg);
+	showStatus = TRUE;
+
+	return showStatus;
+}
+
+BOOL CGITLVideoAnalyserView::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
+{
+	// TODO: Add your message handler code here and/or call default
+	CDC *pDC = this->GetDC();
+	BOOL showStatus = FALSE;
+
+	static double magnifyCoe = 1;
+
+	if (zDelta > 0)
+		magnifyCoe += .05;
+	else
+		magnifyCoe -= .05;
+	
+	const CImage& cimg = this->GetDocument()->gva.GetCurrentFrame();
+	
+	showWidth = cimg.GetWidth() * magnifyCoe;
+	showHeight = cimg.GetHeight() * magnifyCoe;
+	mdbShower.ShowImage(pDC, dpZero.x, dpZero.y, showWidth, showHeight, cimg);
+	showStatus = TRUE;
+
+	return CScrollView::OnMouseWheel(nFlags, zDelta, pt) && showStatus;
+}
+
+void CGITLVideoAnalyserView::OnInitialUpdate()
+{
+    // TODO: Add your specialized code here and/or call the base class
+    CScrollView::OnInitialUpdate();
+
+	CSize sizeTotal;
+	// TODO: calculate the total size of this view
+	sizeTotal.cx = sizeTotal.cy = 100;
+	SetScrollSizes(MM_TEXT, sizeTotal);
+}
+
+void CGITLVideoAnalyserView::OnLButtonDown(UINT nFlags, CPoint point)
+{
+	// TODO: Add your message handler code here and/or call default
+
+	CScrollView::OnLButtonDown(nFlags, point);
+
+	isLButtonDown = TRUE;
+	lbdCapture = point;
+}
+
+
+void CGITLVideoAnalyserView::OnLButtonUp(UINT nFlags, CPoint point)
+{
+	// TODO: Add your message handler code here and/or call default
+
+	CScrollView::OnLButtonUp(nFlags, point);
+	isLButtonDown = FALSE;
+}
+
+
+void CGITLVideoAnalyserView::OnMouseMove(UINT nFlags, CPoint point)
+{
+	// TODO: Add your message handler code here and/or call default
+
+	CScrollView::OnMouseMove(nFlags, point);
+
+	if (!isLButtonDown)
+		return;
+
+	CDC *pDC = this->GetDC();
+	BOOL showStatus = FALSE;
+	static CPoint pOffset;
+	const CImage& cimg = this->GetDocument()->gva.GetCurrentFrame();
+	
+	pOffset = point - lbdCapture;
+	dpZero += pOffset;
+	lbdCapture += pOffset;
+	mdbShower.ShowImage(pDC, dpZero.x, dpZero.y, showWidth, showHeight, cimg);
 }

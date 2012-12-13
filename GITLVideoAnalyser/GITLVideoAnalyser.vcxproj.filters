@@ -78,6 +78,9 @@
     <ClInclude Include="AuxTypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MemoryDoubleBufferingShower.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GITLVideoAnalyser.cpp">
@@ -132,6 +135,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PUDrawer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MemoryDoubleBufferingShower.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

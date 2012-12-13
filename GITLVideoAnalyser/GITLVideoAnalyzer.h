@@ -15,7 +15,7 @@ namespace sysuVideo
 		const CImage& GetCurrentFrame() const;
 		const CImage& GetPreviousFrame();
 		const CImage& GetNextFrame();
-		const CImage& GetNthFrame();
+		const CImage& GetNthFrame(unsigned long /*#frame*/);
 		BOOL HasNextFrame() const;
 		BOOL HasPreviousFrame() const;
 		BOOL HasNthFrame(unsigned long) const;
@@ -33,11 +33,15 @@ namespace sysuVideo
 
 		void MagnifyCU(POINT /* Position */);
 
-		BOOL OpenVideoFile(LPWSTR /* File path */);
+		BOOL OpenVideoFile(CString * /* File path */);
 		BOOL OpenAnalyticalFile(LPWSTR /* File path */);
 
 	private:
 		VideoReader *pVReader;
+		BOOL bVideoOpen;
 		ImageDecorator *pImgDeco;
+		BOOL bDecoReady;
+
+		unsigned long curWorkingFrmNum;
 	};
 }

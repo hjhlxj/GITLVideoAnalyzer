@@ -12,13 +12,15 @@ namespace sysuVideo
 		YUVReader(void);
 		~YUVReader(void);
 
-		virtual BOOL HasNextFrame() const;
-		virtual BOOL HasPreFrame() const;
-		virtual const CImage& GetNextFrame();
-		virtual const CImage& GetPreFrame();
-		virtual const CImage& GetCurFrame();
-		virtual BOOL Init(LPVOID /*structure of initialization info*/);
-		virtual void Save(LPCWSTR /*file path*/, LPVOID /*structure of save info*/);
+		virtual BOOL HasNextFrame() const override;
+		virtual BOOL HasPreFrame() const override;
+		virtual BOOL HasNthFrame(unsigned long /*#frame*/) const override;
+		virtual const CImage& GetNthFrame(unsigned long /*frame number*/) override;
+		virtual const CImage& GetNextFrame() override;
+		virtual const CImage& GetPreFrame() override;
+		virtual const CImage& GetCurFrame() override;
+		virtual BOOL Init(LPVOID /*structure of initialization info*/) override;
+		virtual void Save(LPCWSTR /*file path*/, LPVOID /*structure of save info*/) override;
 		virtual BOOL InitViaFilepath(CString /*filepath*/);
 
 	protected:	//Member functions
