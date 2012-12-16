@@ -30,7 +30,7 @@ void sysuVideo::MVDrawer::Init(LPWSTR filepath)
 	BuildIndex();
 }
 
-void sysuVideo::MVDrawer::Draw(ImgBlcok *block, CDC *pDC)
+void sysuVideo::MVDrawer::Draw(ImgBlock *block, CDC *pDC)
 {
 	static CPen *oldPen;
 	static RECT curCU;
@@ -39,16 +39,25 @@ void sysuVideo::MVDrawer::Draw(ImgBlcok *block, CDC *pDC)
 	if (!enable)
 		return;
 
+	if (IMGBLOCKTYPETAG::CMD_FLAG == block->type)
+	{
+		getMVsForNextLCU();
+		return;
+	}
+
 	if ((IMGBLOCKTYPETAG::PU_HORZ_SPLIT != block->type &&
 		IMGBLOCKTYPETAG::PU_VERT_SPLIT != block->type && 
 		IMGBLOCKTYPETAG::ACTOMIC_BLOCK != block->type &&
 		IMGBLOCKTYPETAG::PU_QUARTILE_SPLIT != block->type))
 		return;			// Motion vector is for PU only
-	
-	oldPen = pDC->SelectObject(&pen);	
 
 	if (pVOffset >= pVSize - 1)
-		getMVsForNextLCU();
+	{
+		MessageBox(NULL, _T("MV buffer overrun"), _T("Oops"), MB_OK);
+		return; //getMVsForNextLCU();
+	}
+
+	oldPen = pDC->SelectObject(&pen);	
 
 	switch (pPUVectors[++pVOffset])
 	{
@@ -136,7 +145,7 @@ void sysuVideo::MVDrawer::Locale(unsigned long index)
 
 	fseek(directStream, streamIndex[index], SEEK_SET);
 	curWorkingFrm = index;
-	getMVsForNextLCU();
+	//getMVsForNextLCU();
 }
 
 void sysuVideo::MVDrawer::getMVsForNextLCU()
@@ -160,7 +169,7 @@ void sysuVideo::MVDrawer::getMVsForNextLCU()
 	}
 
 	pVSize = 0;
-
+	 
 	token = strtok_s(NULL, " ", &nextToken);
 	while (token != NULL && *token != '\n')
 	{		

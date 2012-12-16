@@ -75,7 +75,7 @@ void sysuVideo::BlockSequenceManager::BuildIndex()
 	indexSize = blockIndex.size();
 }
 
-BOOL sysuVideo::BlockSequenceManager::GetNextBlock(ImgBlcok *block)
+BOOL sysuVideo::BlockSequenceManager::GetNextBlock(ImgBlock *block)
 {
 	if (block == NULL)
 		return FALSE;
@@ -110,7 +110,9 @@ void sysuVideo::BlockSequenceManager::updateBlockSequence()
 {
 	static RECT curCU;
 	static std::stack<RECT> Blocks;
-	static ImgBlcok ib;
+	static ImgBlock ib;
+
+	int LCUNum = -1;
 
 	curLCU.left = -LCUSIZE;
 	curLCU.top = curLCU.right = 0;
@@ -121,6 +123,17 @@ void sysuVideo::BlockSequenceManager::updateBlockSequence()
 	while (getNextLCU(&curCU))
 	{
 		Blocks.push(curCU);
+
+		// Push a block that contians the working LCU update command
+		ib.type = IMGBLOCKTYPETAG::CMD_FLAG;
+		ib.area.top = ++LCUNum;
+		blockSeq.push_back(ib);
+
+		/*if (LCUNum != 4)
+		{
+			Blocks.pop();
+			continue;
+		}*/
 
 		while (!Blocks.empty())
 		{
@@ -151,7 +164,7 @@ BOOL sysuVideo::BlockSequenceManager::getNextLCU(RECT *lcu)
 {		
 	/*static int x = 0;
 	
-	if (x++ > 0)
+	if (x++ != 3)
 		return FALSE;*/
 
 	curLCU.left += LCUSIZE;
@@ -233,6 +246,7 @@ BOOL sysuVideo::BlockSequenceManager::localeCUInfo(void)
 	fgets(buf, bufsize, blockStream);
 	token = strtok_s(buf, " ", &nextToken);
 	sscanf_s(token, "<%lu,%lu>", &frmCnt, &CUCnt);
+
 	sflength = 0;
 
 	if (frmCnt != curWorkingFrame)
@@ -262,7 +276,7 @@ BOOL sysuVideo::BlockSequenceManager::isLCU(RECT *cu)
 void sysuVideo::BlockSequenceManager::appendPUsOfCurCU(RECT *cu)
 {
 	static RECT subRect;
-	static ImgBlcok ib;
+	static ImgBlock ib;
 	
 	switch (splitFlags[sfcursor])
 	{
@@ -313,6 +327,7 @@ void sysuVideo::BlockSequenceManager::appendPUsOfCurCU(RECT *cu)
 		blockSeq.push_back(ib);
 		subRect.top = subRect.bottom;
 		subRect.bottom = cu->bottom;
+		ib.area = subRect;
 		blockSeq.push_back(ib);
 		break;
 	
@@ -326,6 +341,7 @@ void sysuVideo::BlockSequenceManager::appendPUsOfCurCU(RECT *cu)
 		blockSeq.push_back(ib);
 		subRect.left = subRect.right;
 		subRect.right = cu->right;
+		ib.area = subRect;
 		blockSeq.push_back(ib);
 		break;
 
@@ -356,7 +372,6 @@ void sysuVideo::BlockSequenceManager::appendPUsOfCurCU(RECT *cu)
 		subRect.bottom = cu->bottom;
 		ib.area = subRect;
 		blockSeq.push_back(ib);
-		break;
 		break;
 
 	case SIZE_nLx2N:			// horizontal upper segmentation

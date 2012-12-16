@@ -7,8 +7,8 @@ sysuVideo::CUDrawer::CUDrawer(void)
 	enable = FALSE;
 
 	penWidth = 1;
-	penStyle = PS_DASHDOTDOT;
-	penColor = RGB(255, 0, 0);
+	penStyle = PS_SOLID;
+	penColor = RGB(128, 128, 128);
 	pen.CreatePen(penStyle, penWidth, penColor);
 
 	drawFlag = new BYTE[1000];
@@ -23,6 +23,9 @@ sysuVideo::CUDrawer::~CUDrawer(void)
 
 void sysuVideo::CUDrawer::Init(LPWSTR filepath)
 {
+	enable = TRUE;
+	return;
+
 	if (0 != _wfopen_s(&directStream, filepath, _T("r")))
 		return;
 
@@ -32,6 +35,8 @@ void sysuVideo::CUDrawer::Init(LPWSTR filepath)
 
 void sysuVideo::CUDrawer::BuildIndex()
 {
+	return;
+
 	static const int bufSize = 1024 * 3;
 	static char buf[bufSize];
 	static unsigned long frmCnt;
@@ -63,6 +68,8 @@ void sysuVideo::CUDrawer::BuildIndex()
 
 void sysuVideo::CUDrawer::Locale(unsigned long index)
 {
+	return;
+
 	if (!enable)
 		return;
 	
@@ -73,7 +80,7 @@ void sysuVideo::CUDrawer::Locale(unsigned long index)
 	curWorkingFrm = index;
 }
 
-void sysuVideo::CUDrawer::Draw(ImgBlcok *block, CDC *pDC)
+void sysuVideo::CUDrawer::Draw(ImgBlock *block, CDC *pDC)
 {
 	static CPen *oldPen;
 	static RECT curCU;

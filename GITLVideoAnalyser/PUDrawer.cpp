@@ -12,14 +12,14 @@ sysuVideo::PUDrawer::~PUDrawer(void)
 {
 }
 
-void sysuVideo::PUDrawer::Draw(ImgBlcok *block, CDC *pDC)
+void sysuVideo::PUDrawer::Draw(ImgBlock *block, CDC *pDC)
 {
 	static CPen *oldPen;
 	static RECT curCU;
 	static RECT *cu;
 
-	if (dfOffset >= dfSize)
-		readNextLCUDrawingFlag();
+	/*if (dfOffset >= dfSize)
+		readNextLCUDrawingFlag();*/
 
 	if (!enable || (IMGBLOCKTYPETAG::PU_HORZ_SPLIT != block->type &&
 		IMGBLOCKTYPETAG::PU_VERT_SPLIT != block->type && 

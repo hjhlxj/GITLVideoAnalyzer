@@ -10,6 +10,7 @@
 
 #include "MainFrm.h"
 
+#include "MagnifyWnd.h"
 
 // ControlDialogBar dialog
 
@@ -36,8 +37,8 @@ void ControlDialogBar::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(ControlDialogBar, CDialogBar)
 	ON_MESSAGE(WM_INITDIALOG, OnInitDialog)
 	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN1, &ControlDialogBar::OnDeltaposSpin1)
-	ON_EN_KILLFOCUS(IDC_EDIT1, &ControlDialogBar::OnEnKillfocusEdit1)
 	ON_EN_CHANGE(IDC_EDIT1, &ControlDialogBar::OnEnChangeEdit1)
+	ON_BN_CLICKED(IDC_BUTTON1, &ControlDialogBar::OnBnClickedButton1)
 END_MESSAGE_MAP()
 
 
@@ -75,23 +76,12 @@ void ControlDialogBar::OnDeltaposSpin1(NMHDR *pNMHDR, LRESULT *pResult)
 	m_edit = max(0, m_edit);
 	m_edit = min(maxFrameCount, m_edit);
 	wsprintfW(buf, _T("%d"), m_edit);
+	isSpinTrigger = TRUE;
 	((CEdit *)GetDlgItem(IDC_EDIT1))->SetWindowTextW(buf);
-
 	
 	*pResult = 0;
 }
 
-void ControlDialogBar::OnEnKillfocusEdit1()
-{
-	// TODO: Add your control notification handler code here
-
-	((CEdit *)GetDlgItem(IDC_EDIT1))->GetWindowTextW(buf, 250);
-	m_edit = StrToIntW(buf);
-	m_edit = max(0, m_edit);
-	m_edit = min(maxFrameCount, m_edit);
-	wsprintfW(buf, _T("%d"), m_edit);
-	((CEdit *)GetDlgItem(IDC_EDIT1))->SetWindowTextW(buf);
-}
 
 void ControlDialogBar::SetTotalFrameCnt(unsigned long fcnt)
 {
@@ -114,6 +104,25 @@ void ControlDialogBar::OnEnChangeEdit1()
 	m_edit = min(maxFrameCount, m_edit);
 	wsprintfW(buf, _T("%d"), m_edit);
 	
-	((CGITLVideoAnalyserView *)((CMainFrame *)::AfxGetMainWnd())->GetActiveView())->ShowNthFrame(m_edit);
+	if (isSpinTrigger)		// avoid duplicate drawing due to edit control changes
+		isSpinTrigger = FALSE;		
+	else 
+		((CGITLVideoAnalyserView *)((CMainFrame *)::AfxGetMainWnd())->GetActiveView())->ShowNthFrame(m_edit);
 	//((CEdit *)GetDlgItem(IDC_EDIT1))->SetWindowTextW(buf);
+}
+
+
+
+
+void ControlDialogBar::OnBnClickedButton1()
+{
+	// TODO: Add your control notification handler code here
+	static sysuVideo::MagnifyWnd mw(100, 100);
+	mw.Show();
+}
+
+void ControlDialogBar::OnUpdateCmdUI(CFrameWnd *pTarget, BOOL bDisableIfNoHandler)
+{
+	bDisableIfNoHandler = FALSE;
+	CDialogBar::OnUpdateCmdUI(pTarget, FALSE);
 }

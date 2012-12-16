@@ -114,11 +114,13 @@
     <ClInclude Include="CodeRef.h" />
     <ClInclude Include="ControlDialogBar.h" />
     <ClInclude Include="CUDrawer.h" />
+    <ClInclude Include="DecisionModeDrawer.h" />
     <ClInclude Include="GITLVideoAnalyser.h" />
     <ClInclude Include="GITLVideoAnalyserDoc.h" />
     <ClInclude Include="GITLVideoAnalyserView.h" />
     <ClInclude Include="GITLVideoAnalyzer.h" />
     <ClInclude Include="ImageDecorator.h" />
+    <ClInclude Include="MagnifyWnd.h" />
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="MemoryDoubleBufferingShower.h" />
     <ClInclude Include="MVDrawer.h" />
@@ -136,11 +138,13 @@
     <ClCompile Include="CodeRef.cpp" />
     <ClCompile Include="ControlDialogBar.cpp" />
     <ClCompile Include="CUDrawer.cpp" />
+    <ClCompile Include="DecisionModeDrawer.cpp" />
     <ClCompile Include="GITLVideoAnalyser.cpp" />
     <ClCompile Include="GITLVideoAnalyserDoc.cpp" />
     <ClCompile Include="GITLVideoAnalyserView.cpp" />
     <ClCompile Include="GITLVideoAnalyzer.cpp" />
     <ClCompile Include="ImageDecorator.cpp" />
+    <ClCompile Include="MagnifyWnd.cpp" />
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="MemoryDoubleBufferingShower.cpp" />
     <ClCompile Include="MVDrawer.cpp" />

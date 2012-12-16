@@ -6,6 +6,7 @@
 
 #include <atlimage.h>
 #include "MemoryDoubleBufferingShower.h"
+#include "MagnifyWnd.h"
 
 class CGITLVideoAnalyserView : public CScrollView
 {
@@ -23,6 +24,9 @@ public:
 	BOOL ShowPreFrame(void);
 	BOOL ShowNthFrame(unsigned long /*#frame*/);
 
+protected:
+	const CImage& getBufferedCurrentFrame();
+
 private:
 	CPoint dpZero;		// the begin point of the draw
 	CPoint lbdCapture;	// the point where left button clicks down
@@ -30,6 +34,9 @@ private:
 	sysuVideo::MemoryDoubleBufferingShower mdbShower;	// double buffering image-shower
 	int showWidth;
 	int showHeight;
+	double magnifyCoe;
+	sysuVideo::MagnifyWnd *magWnd;
+	CImage &bufCurrentFrame;
 
 // Overrides
 public:
@@ -58,6 +65,7 @@ public:
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
+	afx_msg void OnLButtonDblClk(UINT nFlags, CPoint point);
 };
 
 #ifndef _DEBUG  // debug version in GITLVideoAnalyserView.cpp

@@ -9,7 +9,7 @@ namespace sysuVideo
 		virtual ~StreamDirectedDrawer(void);
 
 	public:
-		virtual void Draw(ImgBlcok * /* block */, CDC * /* Device context of the image layer */) = 0; 
+		virtual void Draw(ImgBlock * /* block */, CDC * /* Device context of the image layer */) = 0; 
 		virtual void Disable(BOOL /* flag */);
 		virtual void Locale(unsigned long /* #frame */) = 0;
 		virtual void Init(LPWSTR /* filepath */) = 0;

@@ -11,7 +11,7 @@ namespace sysuVideo
 		CUDrawer(void);
 		~CUDrawer(void);
 
-		void Draw(ImgBlcok *, CDC *) override;
+		void Draw(ImgBlock *, CDC *) override;
 		void BuildIndex() override;
 		void Locale(unsigned long) override;
 		void Init(LPWSTR /* Filepath */) override;

@@ -15,7 +15,8 @@ sysuVideo::MemoryDoubleBufferingShower::~MemoryDoubleBufferingShower(void)
 	memBitmap.DeleteObject();
 }
 
-BOOL sysuVideo::MemoryDoubleBufferingShower::ShowImage(CDC *pDC, int destx, int desty, int width, int height, const CImage& cimg)
+BOOL sysuVideo::MemoryDoubleBufferingShower::ShowImage(CDC *pDC, int destx, int desty, 
+													   int width, int height, const CImage& cimg)
 {	
 	if (width > bufWidth || height > bufHeight)
 		if (!createBuffer(pDC, width, height))
@@ -25,6 +26,22 @@ BOOL sysuVideo::MemoryDoubleBufferingShower::ShowImage(CDC *pDC, int destx, int 
 	
 	cimg.StretchBlt(memDC.m_hDC, destx, desty, width, height,
 					0, 0, cimg.GetWidth(), cimg.GetHeight());
+	pDC->BitBlt(0, 0, bufWidth, bufHeight, &memDC, 0, 0, SRCCOPY);
+
+	return TRUE;
+}
+
+BOOL sysuVideo::MemoryDoubleBufferingShower::ShowImage(CDC *pDC, int destx, int desty, int destWidth,
+				int destHeight, int srcx, int srcy, int srcWidth, int srcHeight, const CImage& src)
+{
+	if (destWidth > bufWidth || destHeight > bufHeight)
+		if (!createBuffer(pDC, destWidth, destHeight))
+			return FALSE;
+	
+	memDC.FillSolidRect(0, 0, bufWidth, bufHeight, RGB(255, 255, 255));
+	
+	src.StretchBlt(memDC.m_hDC, destx, desty, destWidth, destHeight,
+					srcx, srcy, srcWidth, srcHeight);
 	pDC->BitBlt(0, 0, bufWidth, bufHeight, &memDC, 0, 0, SRCCOPY);
 
 	return TRUE;

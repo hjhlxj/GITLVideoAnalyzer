@@ -3,6 +3,7 @@
 #include "CUDrawer.h"
 #include "PUDrawer.h"
 #include "MVDrawer.h"
+#include "DecisionModeDrawer.h"
 #include <cstdarg>
 #include <stack>
 #include <algorithm>
@@ -12,6 +13,9 @@ sysuVideo::BlockRelatedDrawer::BlockRelatedDrawer(CImage *ci)
 	imgBase = ci;
 	imgLayout.Create(ci->GetWidth(), ci->GetHeight(), 32, CImage::createAlphaChannel);
 	
+	drawers.push_back(new DecisionModeDrawer());
+	(**(drawers.rbegin())).Init(_T("d:/master/rc/decoder_pred.txt"));
+
 	drawers.push_back(new CUDrawer());
 	(**(drawers.rbegin())).Init(_T("d:/master/rc/decoder_cupu.txt"));
 	
@@ -66,7 +70,7 @@ void sysuVideo::BlockRelatedDrawer::AddParams(void *)
 
 void sysuVideo::BlockRelatedDrawer::drawBlockInfo()
 {
-	static ImgBlcok block;
+	static ImgBlock block;
 	static CDC dc;
 	CImage *ci = &imgLayout;
 	unsigned long frm = workingFrameCnt;

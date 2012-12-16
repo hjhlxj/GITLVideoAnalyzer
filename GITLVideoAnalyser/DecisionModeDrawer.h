@@ -1,37 +1,37 @@
 #pragma once
-
 #include "StreamDirectedDrawer.h"
 #include <vector>
+#include <map>
 
-namespace sysuVideo 
+namespace sysuVideo
 {
-	class MVDrawer : public StreamDirectedDrawer
+
+	class DecisionModeDrawer :
+		public StreamDirectedDrawer
 	{
 	public:
-		MVDrawer(void);
-		~MVDrawer(void);
+		DecisionModeDrawer(void);
+		~DecisionModeDrawer(void);
 
 	public:
 		virtual void Draw(ImgBlock * /* block */, CDC * /* Device context of the image layer */) override; 
 		virtual void Locale(unsigned long /* #frame */) override;
 		virtual void Init(LPWSTR /* filepath */) override;
 
-	private:
-		void getMVsForNextLCU();
-		void drawVector(RECT * /* Area */, POINT /* Coordinate */, CDC * /* Pointer to the device context */);
-		POINT lpToDp(RECT * /* Reference pu */, POINT& /* logical origin */, POINT & /* Logical Point */);
-
 	protected:	//Auxiliary
 		virtual void BuildIndex() override;
+		void getDMsForNextLCU();
 
 	private:
 		unsigned long indexSize;
 		std::vector<unsigned long> streamIndex;
 
 		unsigned long curWorkingFrm;
+		LPBYTE pDecModes;			//Per-CU decision mode
+		int dmSize;				//drawModes size
+		int dmOffset;			//drawModes offset
 
-		short *pPUVectors;
-		int pVSize;
-		int pVOffset;
+		std::map<DECISIONMODE, CBrush*> brushes;  
 	};
+
 }

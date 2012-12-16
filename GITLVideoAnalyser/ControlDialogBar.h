@@ -1,4 +1,5 @@
 #pragma once
+#include "afxwin.h"
 
 
 // ControlDialogBar dialog
@@ -13,11 +14,15 @@ public:
 
 	virtual void SetTotalFrameCnt(unsigned long fcnt);
 
+	virtual void OnUpdateCmdUI(CFrameWnd *pTarget, BOOL bDisableIfNoHandler); 
+
 // Dialog Data
 	enum { IDD = IDD_DIALOGBAR };
+private:
+	WCHAR buf[256];
+	BOOL isSpinTrigger;
 
 protected:
-	WCHAR buf[256];
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 
 	afx_msg LONG OnInitDialog(UINT, LONG);
@@ -29,6 +34,6 @@ public:
 	int m_edit;
 	int maxFrameCount;
 	afx_msg void OnDeltaposSpin1(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnEnKillfocusEdit1();
 	afx_msg void OnEnChangeEdit1();
+	afx_msg void OnBnClickedButton1();
 };

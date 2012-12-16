@@ -11,7 +11,7 @@ namespace sysuVideo
 		~BlockSequenceManager(void);
 
 	public:
-		BOOL GetNextBlock(ImgBlcok * /* Block container */);
+		BOOL GetNextBlock(ImgBlock * /* Block container */);
 		void BuildIndex();
 		BOOL Locale(unsigned long /* #frame */);
 		BOOL isLCU(RECT * /* CU */);
@@ -34,7 +34,7 @@ namespace sysuVideo
 		unsigned long indexSize;
 		unsigned long indexCursor;
 		
-		std::vector<ImgBlcok> blockSeq;
+		std::vector<ImgBlock> blockSeq;
 		unsigned long seqSize;
 		unsigned long seqCursor;
 

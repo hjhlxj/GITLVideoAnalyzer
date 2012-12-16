@@ -11,6 +11,6 @@ namespace sysuVideo
 		~PUDrawer(void);
 
 	public:
-		virtual void Draw(ImgBlcok * /* block */, CDC * /* Device context of the image layer */) override; 
+		virtual void Draw(ImgBlock * /* block */, CDC * /* Device context of the image layer */) override; 
 	};
 }
