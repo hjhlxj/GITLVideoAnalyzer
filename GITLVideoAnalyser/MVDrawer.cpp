@@ -21,12 +21,17 @@ sysuVideo::MVDrawer::~MVDrawer(void)
 		delete [] pPUVectors;
 }
 
+inline sysuVideo::DRAWERTYPE sysuVideo::MVDrawer::GetDrawerType() const
+{
+	return sysuVideo::DRAWERTYPE::MVDRAWER;
+}
+
 void sysuVideo::MVDrawer::Init(LPWSTR filepath)
 {
 	if (0 != _wfopen_s(&directStream, filepath, _T("r")))
 		return;
 
-	enable = TRUE;
+	//enable = TRUE;
 	BuildIndex();
 }
 

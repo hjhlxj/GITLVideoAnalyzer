@@ -116,6 +116,7 @@ int sysuVideo::GITLVideoAnalyzer::GetVideoHeight() const
 
 void sysuVideo::GITLVideoAnalyzer::ShowCU(BOOL flag)
 {
+	pImgDeco->ActivateDrawers(DRAWERTYPE::CUDRAWER, flag);
 }
 
 void sysuVideo::GITLVideoAnalyzer::ShowCUCost(BOOL flag)
@@ -124,6 +125,7 @@ void sysuVideo::GITLVideoAnalyzer::ShowCUCost(BOOL flag)
 
 void sysuVideo::GITLVideoAnalyzer::ShowPU(BOOL flag)
 {
+	pImgDeco->ActivateDrawers(DRAWERTYPE::PUDRAWER, flag);
 }
 
 void sysuVideo::GITLVideoAnalyzer::ShowPUCost(BOOL flag)
@@ -136,6 +138,12 @@ void sysuVideo::GITLVideoAnalyzer::ShowPUInfo(POINT position)
 
 void sysuVideo::GITLVideoAnalyzer::ShowMV(BOOL flag)
 {
+	pImgDeco->ActivateDrawers(DRAWERTYPE::MVDRAWER, flag);
+}
+
+void sysuVideo::GITLVideoAnalyzer::ShowDecisionMode(BOOL flag)
+{
+	pImgDeco->ActivateDrawers(DRAWERTYPE::MODEDECISIONDRAWER, flag);
 }
 
 void sysuVideo::GITLVideoAnalyzer::MagnifyCU(POINT position)
@@ -150,6 +158,7 @@ BOOL sysuVideo::GITLVideoAnalyzer::OpenAnalyticalFile(LPWSTR filepath)
 BOOL sysuVideo::GITLVideoAnalyzer::OpenVideoFile(CString *filepath)
 {
 	pVReader = VideoReaderFactory::GetInstance().GetVideoReader(sysuVideo::VIDEOREADERTYPE::YUVREADER);
+
 	if (pVReader->Init(filepath))
 	{
 		bVideoOpen = TRUE;

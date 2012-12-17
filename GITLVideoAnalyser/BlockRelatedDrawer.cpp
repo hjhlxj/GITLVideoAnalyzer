@@ -17,10 +17,12 @@ sysuVideo::BlockRelatedDrawer::BlockRelatedDrawer(CImage *ci)
 	(**(drawers.rbegin())).Init(_T("d:/master/rc/decoder_pred.txt"));
 
 	drawers.push_back(new CUDrawer());
-	(**(drawers.rbegin())).Init(_T("d:/master/rc/decoder_cupu.txt"));
-	
+	//(**(drawers.rbegin())).Init(_T("d:/master/rc/decoder_cupu.txt"));
+	(**(drawers.rbegin())).Init();
+
 	drawers.push_back(new PUDrawer());
-	(**(drawers.rbegin())).Init(_T("d:/master/rc/decoder_cupu.txt"));
+	//(**(drawers.rbegin())).Init(_T("d:/master/rc/decoder_cupu.txt"));
+	(**(drawers.rbegin())).Init();
 	
 	drawers.push_back(new MVDrawer());
 	(**(drawers.rbegin())).Init(_T("d:/master/rc/decoder_mv.txt"));
@@ -28,14 +30,14 @@ sysuVideo::BlockRelatedDrawer::BlockRelatedDrawer(CImage *ci)
 	bsmgr = new BlockSequenceManager(_T("d:/master/rc/decoder_cupu.txt"), ci);
 	bsmgr->BuildIndex();
 	
-	for (StreamDirectedDrawer *sdd : drawers)
+	for (DrawerBase *sdd : drawers)
 		activeDrawers.push_back(sdd);
 }
 
 sysuVideo::BlockRelatedDrawer::~BlockRelatedDrawer()
 {
 	std::for_each(drawers.begin(), drawers.end(), 
-		[] (StreamDirectedDrawer *pd) -> void { delete pd; }); 
+		[] (DrawerBase *pd) -> void { delete pd; }); 
 	imgLayout.Destroy();
 	
 	if (bsmgr != NULL)
@@ -63,6 +65,19 @@ void sysuVideo::BlockRelatedDrawer::Decorate(void *img, ...)
 	pcimg->ReleaseDC();
 }
 
+BOOL sysuVideo::BlockRelatedDrawer::ActivateDrawers(DRAWERTYPE type, BOOL activationCode)
+{
+	std::for_each(activeDrawers.begin(), activeDrawers.end(),
+		[type, activationCode] (DrawerBase *db) -> void
+		{ 
+			if (type == db->GetDrawerType())
+				db->Enable(activationCode); 
+		}
+	);
+
+	return TRUE;
+}
+
 void sysuVideo::BlockRelatedDrawer::AddParams(void *)
 {
 	MessageBox(NULL, _T("Memeber function AddParams Not implemented"), _T("Not implemented"), MB_OK);
@@ -82,14 +97,14 @@ void sysuVideo::BlockRelatedDrawer::drawBlockInfo()
 
 	bsmgr->Locale(workingFrameCnt);
 	std::for_each(activeDrawers.begin(), activeDrawers.end(),
-		[frm] (StreamDirectedDrawer *pd) -> void { pd->Locale(frm); });
+		[frm] (DrawerBase *pd) -> void { pd->PreFrameDrawing(frm); });
 
 	hdc = imgLayout.GetDC();
 	pDC->Attach(hdc);
 	while (bsmgr->GetNextBlock(&block))
 	{
 		std::for_each(activeDrawers.begin(), activeDrawers.end(), 
-			[pDC] (StreamDirectedDrawer *pd) -> void { pd->Draw(&block, pDC); });
+			[pDC] (DrawerBase *pd) -> void { pd->Draw(&block, pDC); });
 	}
 
 	pDC->Detach();

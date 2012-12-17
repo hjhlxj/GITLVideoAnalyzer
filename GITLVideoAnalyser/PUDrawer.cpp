@@ -4,12 +4,28 @@
 
 sysuVideo::PUDrawer::PUDrawer(void)
 {
-	SetPenColor(RGB(255, 255, 255));
+	enable = FALSE;
+
+	penWidth = 1;
+	penStyle = PS_SOLID;
+	penColor = RGB(255, 255, 255);
+	pen.CreatePen(penStyle, penWidth, penColor);
 }
 
 
 sysuVideo::PUDrawer::~PUDrawer(void)
 {
+}
+
+inline sysuVideo::DRAWERTYPE sysuVideo::PUDrawer::GetDrawerType() const
+{
+	return sysuVideo::DRAWERTYPE::PUDRAWER;
+}
+
+void sysuVideo::PUDrawer::Init()
+{
+	//enable = TRUE;
+	return;
 }
 
 void sysuVideo::PUDrawer::Draw(ImgBlock *block, CDC *pDC)

@@ -4,13 +4,15 @@
 namespace sysuVideo
 {
 	class PUDrawer :
-		public CUDrawer
+		public DrawerBase
 	{
 	public:
 		PUDrawer(void);
 		~PUDrawer(void);
 
 	public:
-		virtual void Draw(ImgBlock * /* block */, CDC * /* Device context of the image layer */) override; 
+		DRAWERTYPE GetDrawerType() const override;
+		virtual void Draw(ImgBlock * /* block */, CDC * /* Device context of the image layer */) override;
+		void Init() override;
 	};
 }

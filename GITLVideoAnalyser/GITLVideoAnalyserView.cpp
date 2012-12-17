@@ -173,6 +173,20 @@ BOOL CGITLVideoAnalyserView::ShowNthFrame(unsigned long frmNum)
 	return showStatus;
 }
 
+BOOL CGITLVideoAnalyserView::ShowWithRefresh()
+{
+	CDC *pDC = this->GetDC();
+	BOOL showStatus = FALSE;
+
+	const CImage& cimg = this->GetDocument()->gva.GetCurrentFrame();
+	//cimg.Draw(pDC->m_hDC, dpZero.x, dpZero.y, cimg.GetWidth(), cimg.GetHeight());
+	mdbShower.ShowImage(pDC, dpZero.x, dpZero.y, showWidth, showHeight, cimg);
+	bufCurrentFrame = cimg;
+	showStatus = TRUE;
+
+	return showStatus;
+}
+
 const CImage& CGITLVideoAnalyserView::getBufferedCurrentFrame()
 {
 	return bufCurrentFrame;

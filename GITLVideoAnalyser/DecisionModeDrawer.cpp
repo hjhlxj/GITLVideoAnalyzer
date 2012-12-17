@@ -4,6 +4,8 @@
 
 sysuVideo::DecisionModeDrawer::DecisionModeDrawer(void)
 {
+	enable = FALSE;
+
 	pDecModes = new BYTE[1000];
 
 	brushes.insert(std::make_pair(DECISIONMODE::SKIP, new CBrush(RGB(150, 73, 18))));
@@ -24,15 +26,19 @@ sysuVideo::DecisionModeDrawer::~DecisionModeDrawer(void)
 			-> void { delete p.second; });
 }
 
+inline sysuVideo::DRAWERTYPE sysuVideo::DecisionModeDrawer::GetDrawerType() const
+{
+	return sysuVideo::DRAWERTYPE::MODEDECISIONDRAWER;
+}
+
 
 void sysuVideo::DecisionModeDrawer::Init(LPWSTR filepath)
 {
-	enable = TRUE;
+	//enable = TRUE;
 
 	if (0 != _wfopen_s(&directStream, filepath, _T("r")))
 		return;
 
-	enable = TRUE;
 	BuildIndex();
 }
 

@@ -23,6 +23,7 @@ public:
 	BOOL ShowNextFrame(void);
 	BOOL ShowPreFrame(void);
 	BOOL ShowNthFrame(unsigned long /*#frame*/);
+	BOOL ShowWithRefresh(void);
 
 protected:
 	const CImage& getBufferedCurrentFrame();

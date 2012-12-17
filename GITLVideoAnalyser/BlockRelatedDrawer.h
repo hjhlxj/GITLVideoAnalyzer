@@ -1,6 +1,6 @@
 #pragma once
 #include "ImageDecorator.h"
-#include "StreamDirectedDrawer.h"
+#include "DrawerBase.h"
 #include "BlockSequenceManager.h"
 #include <list>
 #include <vector>
@@ -16,6 +16,8 @@ namespace sysuVideo
 
 		virtual void AddParams(void *) override;
 		virtual void Decorate(void * /* pointer to the image */, ...) override;
+
+		virtual BOOL ActivateDrawers(DRAWERTYPE /* Drawer type */, BOOL /* activation code */ =  TRUE) override;
 
 	protected:	//Helper function
 		void drawBlockInfo(void);
@@ -33,8 +35,8 @@ namespace sysuVideo
 		CImage *imgBase;
 
 		BlockSequenceManager *bsmgr;
-		std::list<StreamDirectedDrawer*> activeDrawers;
-		std::vector<StreamDirectedDrawer*> drawers;
+		std::list<DrawerBase*> activeDrawers;
+		std::vector<DrawerBase*> drawers;
 
 		unsigned long workingFrameCnt;
 		//CDC *pDC;

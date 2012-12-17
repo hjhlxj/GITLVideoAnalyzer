@@ -35,5 +35,8 @@ public:
 	int maxFrameCount;
 	afx_msg void OnDeltaposSpin1(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnEnChangeEdit1();
-	afx_msg void OnBnClickedButton1();
+	afx_msg void OnBnClickedCUcheck();
+	afx_msg void OnBnClickedPUcheck();
+	afx_msg void OnBnClickedMVcheck();
+	afx_msg void OnBnClickedMODEcheck();
 };

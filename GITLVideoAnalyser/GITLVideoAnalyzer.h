@@ -30,6 +30,7 @@ namespace sysuVideo
 		void ShowPUCost(BOOL flag = TRUE);
 		void ShowPUInfo(POINT /* Position */);
 		void ShowMV(BOOL flag = TRUE);
+		void ShowDecisionMode(BOOL flag = TRUE);
 
 		void MagnifyCU(POINT /* Position */);
 

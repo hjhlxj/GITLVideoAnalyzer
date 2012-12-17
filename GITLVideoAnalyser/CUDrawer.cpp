@@ -11,74 +11,79 @@ sysuVideo::CUDrawer::CUDrawer(void)
 	penColor = RGB(128, 128, 128);
 	pen.CreatePen(penStyle, penWidth, penColor);
 
-	drawFlag = new BYTE[1000];
+	//drawFlag = new BYTE[1000];
 }
 
 
 sysuVideo::CUDrawer::~CUDrawer(void)
 {
-	if (nullptr != drawFlag)
-		delete [] drawFlag;
+	/*if (nullptr != drawFlag)
+		delete [] drawFlag;*/
 }
 
-void sysuVideo::CUDrawer::Init(LPWSTR filepath)
+inline sysuVideo::DRAWERTYPE sysuVideo::CUDrawer::GetDrawerType() const
 {
-	enable = TRUE;
+	return sysuVideo::DRAWERTYPE::CUDRAWER;
+}
+
+void sysuVideo::CUDrawer::Init()
+{
+	//enable = TRUE;
 	return;
 
-	if (0 != _wfopen_s(&directStream, filepath, _T("r")))
-		return;
+	//if (0 != _wfopen_s(&directStream, filepath, _T("r")))
+	//	return;
 
-	enable = TRUE;
-	BuildIndex();
+	//enable = TRUE;
+	//BuildIndex();
 }
-
-void sysuVideo::CUDrawer::BuildIndex()
-{
-	return;
-
-	static const int bufSize = 1024 * 3;
-	static char buf[bufSize];
-	static unsigned long frmCnt;
-	static unsigned long curFrm;
-
-	if (directStream == NULL)
-		return;
-
-	streamIndex.clear();
-
-	frmCnt = -1;
-
-	while (fgets(buf, bufSize, directStream) != NULL)
-	{
-		sscanf_s(buf, "<%lu,", &curFrm);
-
-		if (curFrm != frmCnt)
-		{
-			streamIndex.push_back(ftell(directStream) - strlen(buf) - 1);
-			frmCnt = curFrm;
-		}
-	}
-
-	indexSize = streamIndex.size();
-
-	dfOffset = 0;
-	dfSize = -1;
-}
-
-void sysuVideo::CUDrawer::Locale(unsigned long index)
-{
-	return;
-
-	if (!enable)
-		return;
-	
-	if (index >= indexSize)
-		return;
-
-	fseek(directStream, streamIndex[index], SEEK_SET);
-	curWorkingFrm = index;
-}
+//
+//void sysuVideo::CUDrawer::BuildIndex()
+//{
+//	return;
+//
+//	static const int bufSize = 1024 * 3;
+//	static char buf[bufSize];
+//	static unsigned long frmCnt;
+//	static unsigned long curFrm;
+//
+//	if (directStream == NULL)
+//		return;
+//
+//	streamIndex.clear();
+//
+//	frmCnt = -1;
+//
+//	while (fgets(buf, bufSize, directStream) != NULL)
+//	{
+//		sscanf_s(buf, "<%lu,", &curFrm);
+//
+//		if (curFrm != frmCnt)
+//		{
+//			streamIndex.push_back(ftell(directStream) - strlen(buf) - 1);
+//			frmCnt = curFrm;
+//		}
+//	}
+//
+//	indexSize = streamIndex.size();
+//
+//	dfOffset = 0;
+//	dfSize = -1;
+//}
+//
+//void sysuVideo::CUDrawer::Locale(unsigned long index)
+//{
+//	return;
+//
+//	if (!enable)
+//		return;
+//	
+//	if (index >= indexSize)
+//		return;
+//
+//	fseek(directStream, streamIndex[index], SEEK_SET);
+//	curWorkingFrm = index;
+//}
 
 void sysuVideo::CUDrawer::Draw(ImgBlock *block, CDC *pDC)
 {
@@ -145,35 +150,35 @@ void sysuVideo::CUDrawer::Draw(ImgBlock *block, CDC *pDC)
 
 }
 
-void sysuVideo::CUDrawer::readNextLCUDrawingFlag()
-{
-	static const int bufSize = 1024 * 3;
-	static int tmp;
-	static char buf[bufSize];
-	static unsigned long frmCnt;
-	static unsigned long curFrm;
-	static char *token, *nextToken;
-
-	fgets(buf, bufSize, directStream);
-	token = strtok_s(buf, " ", &nextToken);
-	sscanf_s(token, "<%lu,%lu>", &frmCnt, &curFrm);
-	dfSize = 0;
-
-	if (frmCnt != curWorkingFrm)
-	{
-		TCHAR sb[100];
-		swprintf_s(sb, _T("curFrm %d, working Frm %d"), frmCnt, curWorkingFrm);
-		MessageBox(NULL, sb, _T("CU"), MB_OK);
-	}
-
-	token = strtok_s(NULL, " ", &nextToken);
-	while (token != NULL && *token != '\n')
-	{		
-		tmp = atoi(token);
-		drawFlag[dfSize] = (BYTE)tmp;
-		++dfSize;
-		token = strtok_s(NULL, " ", &nextToken);
-	}	
-
-	dfOffset = 0;
-}
+//void sysuVideo::CUDrawer::readNextLCUDrawingFlag()
+//{
+//	static const int bufSize = 1024 * 3;
+//	static int tmp;
+//	static char buf[bufSize];
+//	static unsigned long frmCnt;
+//	static unsigned long curFrm;
+//	static char *token, *nextToken;
+//
+//	fgets(buf, bufSize, directStream);
+//	token = strtok_s(buf, " ", &nextToken);
+//	sscanf_s(token, "<%lu,%lu>", &frmCnt, &curFrm);
+//	dfSize = 0;
+//
+//	if (frmCnt != curWorkingFrm)
+//	{
+//		TCHAR sb[100];
+//		swprintf_s(sb, _T("curFrm %d, working Frm %d"), frmCnt, curWorkingFrm);
+//		MessageBox(NULL, sb, _T("CU"), MB_OK);
+//	}
+//
+//	token = strtok_s(NULL, " ", &nextToken);
+//	while (token != NULL && *token != '\n')
+//	{		
+//		tmp = atoi(token);
+//		drawFlag[dfSize] = (BYTE)tmp;
+//		++dfSize;
+//		token = strtok_s(NULL, " ", &nextToken);
+//	}	
+//
+//	dfOffset = 0;
+//}

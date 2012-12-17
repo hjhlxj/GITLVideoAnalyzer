@@ -38,7 +38,10 @@ BEGIN_MESSAGE_MAP(ControlDialogBar, CDialogBar)
 	ON_MESSAGE(WM_INITDIALOG, OnInitDialog)
 	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN1, &ControlDialogBar::OnDeltaposSpin1)
 	ON_EN_CHANGE(IDC_EDIT1, &ControlDialogBar::OnEnChangeEdit1)
-	ON_BN_CLICKED(IDC_BUTTON1, &ControlDialogBar::OnBnClickedButton1)
+	ON_BN_CLICKED(IDC_CUCHECK, &ControlDialogBar::OnBnClickedCUcheck)
+	ON_BN_CLICKED(IDC_PUCHECK, &ControlDialogBar::OnBnClickedPUcheck)
+	ON_BN_CLICKED(IDC_MVCHECK, &ControlDialogBar::OnBnClickedMVcheck)
+	ON_BN_CLICKED(IDC_MODECHECK, &ControlDialogBar::OnBnClickedMODEcheck)
 END_MESSAGE_MAP()
 
 
@@ -112,17 +115,89 @@ void ControlDialogBar::OnEnChangeEdit1()
 }
 
 
-
-
-void ControlDialogBar::OnBnClickedButton1()
-{
-	// TODO: Add your control notification handler code here
-	static sysuVideo::MagnifyWnd mw(100, 100);
-	mw.Show();
-}
-
 void ControlDialogBar::OnUpdateCmdUI(CFrameWnd *pTarget, BOOL bDisableIfNoHandler)
 {
 	bDisableIfNoHandler = FALSE;
 	CDialogBar::OnUpdateCmdUI(pTarget, FALSE);
+}
+
+void ControlDialogBar::OnBnClickedCUcheck()
+{
+	// TODO: Add your control notification handler code here
+	static BOOL checked = FALSE;
+
+	if (checked)
+	{
+		checked = FALSE;
+		((CButton *)GetDlgItem(IDC_CUCHECK))->SetCheck(BST_UNCHECKED);	
+	}
+	else
+	{
+		checked = TRUE;
+		((CButton *)GetDlgItem(IDC_CUCHECK))->SetCheck(BST_CHECKED);	
+	}
+
+	((CGITLVideoAnalyserView *)((CMainFrame *)::AfxGetMainWnd())->GetActiveView())->GetDocument()->gva.ShowCU(checked);
+	((CGITLVideoAnalyserView *)((CMainFrame *)::AfxGetMainWnd())->GetActiveView())->ShowNthFrame(m_edit);
+}
+
+
+void ControlDialogBar::OnBnClickedPUcheck()
+{
+	// TODO: Add your control notification handler code here
+	static BOOL checked = FALSE;
+
+	if (checked)
+	{
+		checked = FALSE;
+		((CButton *)GetDlgItem(IDC_PUCHECK))->SetCheck(BST_UNCHECKED);	
+	}
+	else
+	{
+		checked = TRUE;
+		((CButton *)GetDlgItem(IDC_PUCHECK))->SetCheck(BST_CHECKED);	
+	}
+
+	((CGITLVideoAnalyserView *)((CMainFrame *)::AfxGetMainWnd())->GetActiveView())->GetDocument()->gva.ShowPU(checked);
+	((CGITLVideoAnalyserView *)((CMainFrame *)::AfxGetMainWnd())->GetActiveView())->ShowNthFrame(m_edit);
+}
+
+void ControlDialogBar::OnBnClickedMVcheck()
+{
+	// TODO: Add your control notification handler code here
+	static BOOL checked = FALSE;
+
+	if (checked)
+	{
+		checked = FALSE;
+		((CButton *)GetDlgItem(IDC_MVCHECK))->SetCheck(BST_UNCHECKED);	
+	}
+	else
+	{
+		checked = TRUE;
+		((CButton *)GetDlgItem(IDC_MVCHECK))->SetCheck(BST_CHECKED);	
+	}
+
+	((CGITLVideoAnalyserView *)((CMainFrame *)::AfxGetMainWnd())->GetActiveView())->GetDocument()->gva.ShowMV(checked);
+	((CGITLVideoAnalyserView *)((CMainFrame *)::AfxGetMainWnd())->GetActiveView())->ShowNthFrame(m_edit);
+}
+
+void ControlDialogBar::OnBnClickedMODEcheck()
+{
+	// TODO: Add your control notification handler code here
+	static BOOL checked = FALSE;
+
+	if (checked)
+	{
+		checked = FALSE;
+		((CButton *)GetDlgItem(IDC_MODECHECK))->SetCheck(BST_UNCHECKED);	
+	}
+	else
+	{
+		checked = TRUE;
+		((CButton *)GetDlgItem(IDC_MODECHECK))->SetCheck(BST_CHECKED);	
+	}
+
+	((CGITLVideoAnalyserView *)((CMainFrame *)::AfxGetMainWnd())->GetActiveView())->GetDocument()->gva.ShowDecisionMode(checked);
+	((CGITLVideoAnalyserView *)((CMainFrame *)::AfxGetMainWnd())->GetActiveView())->ShowNthFrame(m_edit);
 }

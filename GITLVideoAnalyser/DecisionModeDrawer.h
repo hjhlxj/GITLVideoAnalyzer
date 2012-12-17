@@ -14,6 +14,7 @@ namespace sysuVideo
 		~DecisionModeDrawer(void);
 
 	public:
+		DRAWERTYPE GetDrawerType() const override;
 		virtual void Draw(ImgBlock * /* block */, CDC * /* Device context of the image layer */) override; 
 		virtual void Locale(unsigned long /* #frame */) override;
 		virtual void Init(LPWSTR /* filepath */) override;

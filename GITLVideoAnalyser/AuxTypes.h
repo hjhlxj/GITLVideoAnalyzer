@@ -16,7 +16,11 @@ namespace sysuVideo
 	enum DRAWERTYPE 
 	{
 		CUDRAWER = 0,
-		MVDRAWER
+		PUDRAWER,
+		MVDRAWER,
+		MODEDECISIONDRAWER,
+
+		NONE
 	};
 
 	enum PartSize : short

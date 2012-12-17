@@ -115,6 +115,7 @@
     <ClInclude Include="ControlDialogBar.h" />
     <ClInclude Include="CUDrawer.h" />
     <ClInclude Include="DecisionModeDrawer.h" />
+    <ClInclude Include="DrawerBase.h" />
     <ClInclude Include="GITLVideoAnalyser.h" />
     <ClInclude Include="GITLVideoAnalyserDoc.h" />
     <ClInclude Include="GITLVideoAnalyserView.h" />
@@ -139,6 +140,7 @@
     <ClCompile Include="ControlDialogBar.cpp" />
     <ClCompile Include="CUDrawer.cpp" />
     <ClCompile Include="DecisionModeDrawer.cpp" />
+    <ClCompile Include="DrawerBase.cpp" />
     <ClCompile Include="GITLVideoAnalyser.cpp" />
     <ClCompile Include="GITLVideoAnalyserDoc.cpp" />
     <ClCompile Include="GITLVideoAnalyserView.cpp" />
