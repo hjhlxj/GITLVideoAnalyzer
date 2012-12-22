@@ -13,7 +13,7 @@ namespace sysuVideo
 
 		DRAWERTYPE GetDrawerType() const override;
 		void Draw(ImgBlock *, CDC *) override;
-		void Init() override;
+		void Init(int /*#num arg*/, ...) override;
 
 		//void BuildIndex() override;
 		//void Locale(unsigned long) override;

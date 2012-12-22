@@ -7,16 +7,18 @@ namespace sysuVideo
 	class BlockSequenceManager
 	{
 	public:		
-		explicit BlockSequenceManager(LPWSTR /* Block(CU) sequence file */, CImage * /* Image layer */);
+		explicit BlockSequenceManager(CImage * /* Image layer */, LPWSTR /* Block(CU) sequence file */ = NULL);
 		~BlockSequenceManager(void);
 
 	public:
 		BOOL GetNextBlock(ImgBlock * /* Block container */);
-		void BuildIndex();
 		BOOL Locale(unsigned long /* #frame */);
-		BOOL isLCU(RECT * /* CU */);
+		void ReloadFile(LPWSTR /* Block(CU) sequence file */);
+		BOOL IsReady();
 
 	private:	//Auxiliary functions
+		void BuildIndex();
+		BOOL isLCU(RECT * /* CU */);
 		void updateBlockSequence();
 		BOOL getNextLCU(RECT * /* LCU */);
 		BOOL splitContinue(RECT * /* CU */);
@@ -29,6 +31,7 @@ namespace sysuVideo
 		BlockSequenceManager &operator=(const BlockSequenceManager&) {};
 
 	private:
+		BOOL dataReady;
 		FILE *blockStream;
 		std::vector<unsigned long> blockIndex;
 		unsigned long indexSize;

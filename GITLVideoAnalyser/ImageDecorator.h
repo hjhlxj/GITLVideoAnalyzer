@@ -1,5 +1,7 @@
 #pragma once
 
+#include "DrawerBase.h"
+
 namespace sysuVideo
 {
 	class ImageDecorator
@@ -9,13 +11,14 @@ namespace sysuVideo
 		virtual ~ImageDecorator(void) {};
 		
 		//Pure virtual members
-		virtual void AddParams(void *) = 0;
-		virtual void Decorate(void * /* pointer to the image */, ...) = 0;
+		virtual void AddParams(PDecoratorParams) = 0;
+		virtual void Decorate(void * /* pointer to the image */, int /*#num arg*/, ...) = 0;
 
 		//virtual void Bind(FILE * /* drawer info*/);
+		virtual BOOL IsReady() = 0;
 		virtual void Disable(BOOL);
 		virtual BOOL ActivateDrawers(DRAWERTYPE /* Drawer type */, BOOL /* activation code */) = 0;
-
+		virtual void* DoForeachDrawer(DRAWERTYPE /* Drawer type */, void* (*)(DrawerBase *) /* Operation */) = 0;
 		//Getters and Setters
 		/*virtual BOOL IsEnalbe() const;
 		virtual COLORREF GetPenColor() const;

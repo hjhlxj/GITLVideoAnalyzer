@@ -20,7 +20,7 @@ namespace sysuVideo
 		int wndWidth;
 		int wndHeight;
 		BOOL isWndHiden;
-
+		CRect posRect;
 		MemoryDoubleBufferingShower mdbs;
 	public:
 		DECLARE_MESSAGE_MAP()

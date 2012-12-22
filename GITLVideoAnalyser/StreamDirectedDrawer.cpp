@@ -4,15 +4,29 @@
 
 sysuVideo::StreamDirectedDrawer::StreamDirectedDrawer(void)
 {
+	directStream = NULL;
+	enable = FALSE;
 }
 
 sysuVideo::StreamDirectedDrawer::~StreamDirectedDrawer(void)
 {
 }
 
-void sysuVideo::StreamDirectedDrawer::PreFrameDrawing(unsigned long frameCnt)
+void sysuVideo::StreamDirectedDrawer::PreDrawingFrame(unsigned long frameCnt)
 {
 	Locale(frameCnt);
+}
+
+BOOL sysuVideo::StreamDirectedDrawer::IsEnable() const
+{
+	return NULL != directStream && enable;
+}
+
+void sysuVideo::StreamDirectedDrawer::Enable(BOOL flag)
+{
+	if (NULL == directStream)
+		return;
+	enable = flag;
 }
 
 //void sysuVideo::StreamDirectedDrawer::Disable(BOOL enableFlag = false)

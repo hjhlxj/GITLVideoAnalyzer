@@ -3,10 +3,10 @@
 
 namespace sysuVideo
 {
-	typedef enum {
+	enum VIDEOREADERTYPE {
 		YUVREADER,
 		DEFAULTREADER
-	} VIDEOREADERTYPE;
+	};
 
 	class VideoReader
 	{

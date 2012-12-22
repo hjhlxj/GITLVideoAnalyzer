@@ -90,6 +90,18 @@
     <ClInclude Include="DrawerBase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DiffDrawer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AnalyticalFileChooser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AnalyserControlPanel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AuxFunc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GITLVideoAnalyser.cpp">
@@ -156,6 +168,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DrawerBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DiffDrawer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AnalyticalFileChooser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AnalyserControlPanel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

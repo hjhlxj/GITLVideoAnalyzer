@@ -13,6 +13,6 @@ namespace sysuVideo
 	public:
 		DRAWERTYPE GetDrawerType() const override;
 		virtual void Draw(ImgBlock * /* block */, CDC * /* Device context of the image layer */) override;
-		void Init() override;
+		void Init(int /*#num arg*/, ...) override;
 	};
 }

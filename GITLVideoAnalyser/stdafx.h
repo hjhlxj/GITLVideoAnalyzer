@@ -35,6 +35,7 @@
 
 #include <atlimage.h>
 #include "AuxTypes.h"
+#include <afxdlgs.h>
 
 
 

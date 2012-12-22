@@ -11,12 +11,15 @@
 #include "MainFrm.h"
 
 #include "MagnifyWnd.h"
+#include "AnalyserControlPanel.h"
+
+#include "AuxFunc.h"
 
 // ControlDialogBar dialog
 
 IMPLEMENT_DYNAMIC(ControlDialogBar, CDialogBar)
 
-ControlDialogBar::ControlDialogBar()
+ControlDialogBar::ControlDialogBar() : acp(_T("Analyser Control Panel"))
 {
 	m_edit = 0;
 	maxFrameCount = 99999999;
@@ -42,6 +45,10 @@ BEGIN_MESSAGE_MAP(ControlDialogBar, CDialogBar)
 	ON_BN_CLICKED(IDC_PUCHECK, &ControlDialogBar::OnBnClickedPUcheck)
 	ON_BN_CLICKED(IDC_MVCHECK, &ControlDialogBar::OnBnClickedMVcheck)
 	ON_BN_CLICKED(IDC_MODECHECK, &ControlDialogBar::OnBnClickedMODEcheck)
+	ON_BN_CLICKED(IDC_BUTTONSHOWDIFF, &ControlDialogBar::OnBnClickedButtonshowdiff)
+	ON_BN_CLICKED(IDC_RADIOCURVIDEO, &ControlDialogBar::OnBnClickedRadiocurvideo)
+	ON_BN_CLICKED(IDC_RADIOCMPVIDEO, &ControlDialogBar::OnBnClickedRadiocmpvideo)
+	ON_BN_CLICKED(IDC_BUTTONCTRLPNL, &ControlDialogBar::OnBnClickedButton2)
 END_MESSAGE_MAP()
 
 
@@ -57,6 +64,9 @@ LONG ControlDialogBar::OnInitDialog(UINT wParam, LONG lParam)
 	
 	m_spin.SetBuddy(GetDlgItem(IDC_EDIT1));
 
+	((CButton *)GetDlgItem(IDC_RADIOCURVIDEO))->EnableWindow(FALSE);
+	((CButton *)GetDlgItem(IDC_RADIOCMPVIDEO))->EnableWindow(FALSE);
+
 	return bRet;
 }
 
@@ -67,12 +77,14 @@ void ControlDialogBar::OnDeltaposSpin1(NMHDR *pNMHDR, LRESULT *pResult)
 	
 	if (pNMUpDown->iDelta == 1)
 	{	
-		if (((CGITLVideoAnalyserView *)((CMainFrame *)::AfxGetMainWnd())->GetActiveView())->ShowPreFrame())
+		//if (((CGITLVideoAnalyserView *)((CMainFrame *)::AfxGetMainWnd())->GetActiveView())->ShowPreFrame())
+		if (GetGITLAppView()->ShowPreFrame())
 			m_edit -= 1;
 	}
 	else
 	{
-		if (((CGITLVideoAnalyserView *)((CMainFrame *)::AfxGetMainWnd())->GetActiveView())->ShowNextFrame())
+		//if (((CGITLVideoAnalyserView *)((CMainFrame *)::AfxGetMainWnd())->GetActiveView())->ShowNextFrame())
+		if (GetGITLAppView()->ShowNextFrame())
 			m_edit += 1;
 	}
 
@@ -110,7 +122,8 @@ void ControlDialogBar::OnEnChangeEdit1()
 	if (isSpinTrigger)		// avoid duplicate drawing due to edit control changes
 		isSpinTrigger = FALSE;		
 	else 
-		((CGITLVideoAnalyserView *)((CMainFrame *)::AfxGetMainWnd())->GetActiveView())->ShowNthFrame(m_edit);
+		//((CGITLVideoAnalyserView *)((CMainFrame *)::AfxGetMainWnd())->GetActiveView())->ShowNthFrame(m_edit);
+		GetGITLAppView()->ShowNthFrame(m_edit);
 	//((CEdit *)GetDlgItem(IDC_EDIT1))->SetWindowTextW(buf);
 }
 
@@ -137,8 +150,10 @@ void ControlDialogBar::OnBnClickedCUcheck()
 		((CButton *)GetDlgItem(IDC_CUCHECK))->SetCheck(BST_CHECKED);	
 	}
 
-	((CGITLVideoAnalyserView *)((CMainFrame *)::AfxGetMainWnd())->GetActiveView())->GetDocument()->gva.ShowCU(checked);
-	((CGITLVideoAnalyserView *)((CMainFrame *)::AfxGetMainWnd())->GetActiveView())->ShowNthFrame(m_edit);
+	//((CGITLVideoAnalyserView *)((CMainFrame *)::AfxGetMainWnd())->GetActiveView())->GetDocument()->gva.ShowCU(checked);
+	//((CGITLVideoAnalyserView *)((CMainFrame *)::AfxGetMainWnd())->GetActiveView())->ShowNthFrame(m_edit);
+	GetGVA().ShowCU(checked);
+	GetGITLAppView()->ShowNthFrame(m_edit);
 }
 
 
@@ -158,8 +173,10 @@ void ControlDialogBar::OnBnClickedPUcheck()
 		((CButton *)GetDlgItem(IDC_PUCHECK))->SetCheck(BST_CHECKED);	
 	}
 
-	((CGITLVideoAnalyserView *)((CMainFrame *)::AfxGetMainWnd())->GetActiveView())->GetDocument()->gva.ShowPU(checked);
-	((CGITLVideoAnalyserView *)((CMainFrame *)::AfxGetMainWnd())->GetActiveView())->ShowNthFrame(m_edit);
+	/*((CGITLVideoAnalyserView *)((CMainFrame *)::AfxGetMainWnd())->GetActiveView())->GetDocument()->gva.ShowPU(checked);
+	((CGITLVideoAnalyserView *)((CMainFrame *)::AfxGetMainWnd())->GetActiveView())->ShowNthFrame(m_edit);*/
+	GetGVA().ShowPU(checked);
+	GetGITLAppView()->ShowNthFrame(m_edit);
 }
 
 void ControlDialogBar::OnBnClickedMVcheck()
@@ -178,8 +195,10 @@ void ControlDialogBar::OnBnClickedMVcheck()
 		((CButton *)GetDlgItem(IDC_MVCHECK))->SetCheck(BST_CHECKED);	
 	}
 
-	((CGITLVideoAnalyserView *)((CMainFrame *)::AfxGetMainWnd())->GetActiveView())->GetDocument()->gva.ShowMV(checked);
-	((CGITLVideoAnalyserView *)((CMainFrame *)::AfxGetMainWnd())->GetActiveView())->ShowNthFrame(m_edit);
+	/*((CGITLVideoAnalyserView *)((CMainFrame *)::AfxGetMainWnd())->GetActiveView())->GetDocument()->gva.ShowMV(checked);
+	((CGITLVideoAnalyserView *)((CMainFrame *)::AfxGetMainWnd())->GetActiveView())->ShowNthFrame(m_edit);*/
+	GetGVA().ShowMV(checked);
+	GetGITLAppView()->ShowNthFrame(m_edit);
 }
 
 void ControlDialogBar::OnBnClickedMODEcheck()
@@ -198,6 +217,61 @@ void ControlDialogBar::OnBnClickedMODEcheck()
 		((CButton *)GetDlgItem(IDC_MODECHECK))->SetCheck(BST_CHECKED);	
 	}
 
-	((CGITLVideoAnalyserView *)((CMainFrame *)::AfxGetMainWnd())->GetActiveView())->GetDocument()->gva.ShowDecisionMode(checked);
-	((CGITLVideoAnalyserView *)((CMainFrame *)::AfxGetMainWnd())->GetActiveView())->ShowNthFrame(m_edit);
+	/*((CGITLVideoAnalyserView *)((CMainFrame *)::AfxGetMainWnd())->GetActiveView())->GetDocument()->gva.ShowDecisionMode(checked);
+	((CGITLVideoAnalyserView *)((CMainFrame *)::AfxGetMainWnd())->GetActiveView())->ShowNthFrame(m_edit);*/
+	GetGVA().ShowDecisionMode(checked);
+	GetGITLAppView()->ShowNthFrame(m_edit);
+}
+
+void ControlDialogBar::OnBnClickedButtonshowdiff()
+{
+	// TODO: Add your control notification handler code here
+	((CButton *)GetDlgItem(IDC_RADIOCURVIDEO))->EnableWindow(TRUE);
+	((CButton *)GetDlgItem(IDC_RADIOCMPVIDEO))->EnableWindow(TRUE);
+	((CButton *)GetDlgItem(IDC_RADIOCURVIDEO))->SetCheck(BST_CHECKED);
+	((CButton *)GetDlgItem(IDC_RADIOCMPVIDEO))->SetCheck(BST_UNCHECKED);
+	/*((CGITLVideoAnalyserView *)((CMainFrame *)::AfxGetMainWnd())->GetActiveView())->GetDocument()->gva.ShowCompareResult(TRUE);
+	((CGITLVideoAnalyserView *)((CMainFrame *)::AfxGetMainWnd())->GetActiveView())->ShowNthFrame(m_edit);*/
+	GetGVA().ShowCompareResult(TRUE);
+	GetGITLAppView()->ShowNthFrame(m_edit);
+}
+
+
+void ControlDialogBar::OnBnClickedRadiocurvideo()
+{
+	// TODO: Add your control notification handler code here
+
+	if (!((CButton *)GetDlgItem(IDC_RADIOCMPVIDEO))->GetCheck())
+	{
+		/*((CGITLVideoAnalyserView *)((CMainFrame *)::AfxGetMainWnd())->GetActiveView())->GetDocument()->gva.SwitchDecorator();
+		((CGITLVideoAnalyserView *)((CMainFrame *)::AfxGetMainWnd())->GetActiveView())->GetDocument()->gva.ShowCompareResult(TRUE);
+		((CGITLVideoAnalyserView *)((CMainFrame *)::AfxGetMainWnd())->GetActiveView())->ShowNthFrame(m_edit);*/
+		GetGVA().SwitchDecorator();
+		GetGVA().ShowCompareResult(TRUE);
+		GetGITLAppView()->ShowNthFrame(m_edit);
+		((CButton *)GetDlgItem(IDC_RADIOCURVIDEO))->SetCheck(BST_CHECKED);
+		((CButton *)GetDlgItem(IDC_RADIOCMPVIDEO))->SetCheck(BST_UNCHECKED);
+	}
+}
+
+
+void ControlDialogBar::OnBnClickedRadiocmpvideo()
+{
+	// TODO: Add your control notification handler code here
+
+	if (!((CButton *)GetDlgItem(IDC_RADIOCURVIDEO))->GetCheck())
+	{
+		((CGITLVideoAnalyserView *)((CMainFrame *)::AfxGetMainWnd())->GetActiveView())->GetDocument()->gva.SwitchDecorator();
+		((CGITLVideoAnalyserView *)((CMainFrame *)::AfxGetMainWnd())->GetActiveView())->GetDocument()->gva.ShowCompareResult(TRUE);
+		((CGITLVideoAnalyserView *)((CMainFrame *)::AfxGetMainWnd())->GetActiveView())->ShowNthFrame(m_edit);
+		((CButton *)GetDlgItem(IDC_RADIOCURVIDEO))->SetCheck(BST_UNCHECKED);
+		((CButton *)GetDlgItem(IDC_RADIOCMPVIDEO))->SetCheck(BST_CHECKED);
+	}
+}
+
+void ControlDialogBar::OnBnClickedButton2()
+{
+	// TODO: Add your control notification handler code here
+	
+	acp.DoModal();
 }

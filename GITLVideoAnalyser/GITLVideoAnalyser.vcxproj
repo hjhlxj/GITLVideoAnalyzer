@@ -108,6 +108,9 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AnalyserControlPanel.h" />
+    <ClInclude Include="AnalyticalFileChooser.h" />
+    <ClInclude Include="AuxFunc.h" />
     <ClInclude Include="AuxTypes.h" />
     <ClInclude Include="BlockRelatedDrawer.h" />
     <ClInclude Include="BlockSequenceManager.h" />
@@ -115,6 +118,7 @@
     <ClInclude Include="ControlDialogBar.h" />
     <ClInclude Include="CUDrawer.h" />
     <ClInclude Include="DecisionModeDrawer.h" />
+    <ClInclude Include="DiffDrawer.h" />
     <ClInclude Include="DrawerBase.h" />
     <ClInclude Include="GITLVideoAnalyser.h" />
     <ClInclude Include="GITLVideoAnalyserDoc.h" />
@@ -134,12 +138,15 @@
     <ClInclude Include="YUVReader.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AnalyserControlPanel.cpp" />
+    <ClCompile Include="AnalyticalFileChooser.cpp" />
     <ClCompile Include="BlockRelatedDrawer.cpp" />
     <ClCompile Include="BlockSequenceManager.cpp" />
     <ClCompile Include="CodeRef.cpp" />
     <ClCompile Include="ControlDialogBar.cpp" />
     <ClCompile Include="CUDrawer.cpp" />
     <ClCompile Include="DecisionModeDrawer.cpp" />
+    <ClCompile Include="DiffDrawer.cpp" />
     <ClCompile Include="DrawerBase.cpp" />
     <ClCompile Include="GITLVideoAnalyser.cpp" />
     <ClCompile Include="GITLVideoAnalyserDoc.cpp" />

@@ -31,15 +31,18 @@ static void splitCU(RECT& rect, std::stack<RECT>& s)
 	s.push(subRect);
 }
 
-sysuVideo::BlockSequenceManager::BlockSequenceManager(LPWSTR filepath, CImage *imglayer)
+sysuVideo::BlockSequenceManager::BlockSequenceManager(CImage *imglayer, LPWSTR filepath)
 {
-	if (0 != _wfopen_s(&blockStream, filepath, _T("r")))
+	if (NULL != filepath && 0 != _wfopen_s(&blockStream, filepath, _T("r")))
 		throw new CFileException(0, -1, filepath);
 
 	imgHeight = imglayer->GetHeight();
 	imgWidth = imglayer->GetWidth();	
 	splitFlags = new BYTE[(imglayer->GetWidth() / LCUSIZE + 1) * (imglayer->GetHeight() / LCUSIZE + 1) * 4]; 
 	seqCursor = 0;
+	dataReady = FALSE;
+	//BuildIndex();
+	//Locale(0);
 }
 
 sysuVideo::BlockSequenceManager::~BlockSequenceManager(void)
@@ -75,13 +78,27 @@ void sysuVideo::BlockSequenceManager::BuildIndex()
 	indexSize = blockIndex.size();
 }
 
+void sysuVideo::BlockSequenceManager::ReloadFile(LPWSTR filepath)
+{
+	if (0 != _wfopen_s(&blockStream, filepath, _T("r")))
+		throw new CFileException(0, -1, filepath);
+	BuildIndex();
+	Locale(0);
+	dataReady = TRUE;
+}
+
+BOOL sysuVideo::BlockSequenceManager::IsReady()
+{
+	return dataReady;
+}
+
 BOOL sysuVideo::BlockSequenceManager::GetNextBlock(ImgBlock *block)
 {
 	if (block == NULL)
 		return FALSE;
 
 	if (seqCursor >= seqSize)		//Reach the end of block sequence of the current frame
-		if (!Locale(indexCursor + 1))	//Get the cu blocks for the next frame
+		//if (!Locale(indexCursor + 1))	//Get the cu blocks for the next frame
 			return FALSE;
 	
 	*block = blockSeq[seqCursor++];
@@ -127,6 +144,10 @@ void sysuVideo::BlockSequenceManager::updateBlockSequence()
 		// Push a block that contians the working LCU update command
 		ib.type = IMGBLOCKTYPETAG::CMD_FLAG;
 		ib.area.top = ++LCUNum;
+		blockSeq.push_back(ib);
+
+		ib.type = IMGBLOCKTYPETAG::LCU;
+		ib.area = curCU;
 		blockSeq.push_back(ib);
 
 		/*if (LCUNum != 4)
@@ -180,7 +201,7 @@ BOOL sysuVideo::BlockSequenceManager::getNextLCU(RECT *lcu)
 			curLCU.bottom += LCUSIZE;
 
 			//adjust bottom
-			curLCU.bottom = min(curLCU.bottom, imgHeight);
+			//curLCU.bottom = min(curLCU.bottom, imgHeight);
 		}
 		else
 		{
@@ -194,7 +215,7 @@ BOOL sysuVideo::BlockSequenceManager::getNextLCU(RECT *lcu)
 	}
 
 	//Adjust right
-	curLCU.right = min(curLCU.right, imgWidth);
+	//curLCU.right = min(curLCU.right, imgWidth);
 	*lcu = curLCU;
 
 	if (localeCUInfo())	//Locale the stream to the current LCU split information line

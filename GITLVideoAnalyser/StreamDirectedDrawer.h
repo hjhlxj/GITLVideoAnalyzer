@@ -13,9 +13,11 @@ namespace sysuVideo
 
 	public:
 		//virtual void Disable(BOOL /* flag */);
-		virtual void PreFrameDrawing(unsigned long /* #frame to be draw */) override;
-		virtual void Init(LPWSTR /* filepath */) = 0;
-
+		virtual void PreDrawingFrame(unsigned long /* #frame to be draw */) override;
+		virtual void Init(LPWSTR /* filepath */, int /*#num arg*/, ...) override = 0;
+		virtual void Locale(unsigned long /* #frame */) = 0;
+		virtual BOOL IsEnable() const override;
+		virtual void Enable(BOOL /* flag */) override;
 		//Getters and Setters
 		/*virtual BOOL IsEnalbe() const;
 		virtual COLORREF GetPenColor() const;
@@ -27,7 +29,6 @@ namespace sysuVideo
 		
 	protected:	//Auxiliary
 		virtual void BuildIndex() = 0;
-		virtual void Locale(unsigned long /* #frame */) = 0;
 
 	protected:
 		FILE *directStream;

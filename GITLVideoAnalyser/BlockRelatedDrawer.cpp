@@ -4,17 +4,65 @@
 #include "PUDrawer.h"
 #include "MVDrawer.h"
 #include "DecisionModeDrawer.h"
+#include "DiffDrawer.h"
 #include <cstdarg>
 #include <stack>
 #include <algorithm>
 
-sysuVideo::BlockRelatedDrawer::BlockRelatedDrawer(CImage *ci)
+BOOL sysuVideo::BlockDrawersFactory::bHasInstance = FALSE;
+sysuVideo::BlockDrawersFactory* sysuVideo::BlockDrawersFactory::ins = NULL;
+
+sysuVideo::BlockDrawersFactory* sysuVideo::BlockDrawersFactory::GetInstance()
+{
+	if (FALSE == bHasInstance)
+	{
+		ins = new BlockDrawersFactory();
+		bHasInstance = TRUE;
+	}
+	return ins;
+}
+
+sysuVideo::DrawerBase* sysuVideo::BlockDrawersFactory::CreateDrawer(sysuVideo::DRAWERTYPE t)
+{
+	DrawerBase* pd = NULL;
+	switch(t)
+	{
+	case DRAWERTYPE::CUDRAWER:
+		pd = new CUDrawer();
+		break;
+
+	case DRAWERTYPE::PUDRAWER:
+		pd = new PUDrawer();
+		break;
+
+	case DRAWERTYPE::MVDRAWER:
+		pd = new MVDrawer();
+		break;
+
+	case DRAWERTYPE::MODEDECISIONDRAWER:
+		pd = new DecisionModeDrawer();
+		break;
+
+	case DRAWERTYPE::DIFFDRAWER:
+		pd = new DiffDrawer();
+		break;
+
+	default:
+		break;
+	}
+
+	return pd;
+}
+
+//experiment only construct
+sysuVideo::BlockRelatedDrawer::BlockRelatedDrawer(CImage *ci, LPWSTR bs, LPWSTR mv, 
+												  LPWSTR md, LPWSTR diff, LPWSTR cmp)
 {
 	imgBase = ci;
 	imgLayout.Create(ci->GetWidth(), ci->GetHeight(), 32, CImage::createAlphaChannel);
 	
 	drawers.push_back(new DecisionModeDrawer());
-	(**(drawers.rbegin())).Init(_T("d:/master/rc/decoder_pred.txt"));
+	(**(drawers.rbegin())).Init(md);
 
 	drawers.push_back(new CUDrawer());
 	//(**(drawers.rbegin())).Init(_T("d:/master/rc/decoder_cupu.txt"));
@@ -25,10 +73,39 @@ sysuVideo::BlockRelatedDrawer::BlockRelatedDrawer(CImage *ci)
 	(**(drawers.rbegin())).Init();
 	
 	drawers.push_back(new MVDrawer());
-	(**(drawers.rbegin())).Init(_T("d:/master/rc/decoder_mv.txt"));
+	(**(drawers.rbegin())).Init(mv);
 
-	bsmgr = new BlockSequenceManager(_T("d:/master/rc/decoder_cupu.txt"), ci);
-	bsmgr->BuildIndex();
+	drawers.push_back(new DiffDrawer());
+	(**(drawers.rbegin())).Init(diff, 0, cmp);
+
+	bsmgr = new BlockSequenceManager(ci);
+	//bsmgr->BuildIndex();
+	
+	for (DrawerBase *sdd : drawers)
+		activeDrawers.push_back(sdd);
+}
+
+sysuVideo::BlockRelatedDrawer::BlockRelatedDrawer(CImage *ci)
+{
+	imgBase = ci;
+	imgLayout.Create(ci->GetWidth(), ci->GetHeight(), 32, CImage::createAlphaChannel);
+	
+	drawers.push_back(new DecisionModeDrawer());
+	//(**(drawers.rbegin())).Init(_T("d:/master/rc/decoder_pred.txt"));
+
+	drawers.push_back(new CUDrawer());
+	//(**(drawers.rbegin())).Init(_T("d:/master/rc/decoder_cupu.txt"));
+	//(**(drawers.rbegin())).Init();
+
+	drawers.push_back(new PUDrawer());
+	//(**(drawers.rbegin())).Init(_T("d:/master/rc/decoder_cupu.txt"));
+	//(**(drawers.rbegin())).Init();
+	
+	drawers.push_back(new MVDrawer());
+	//(**(drawers.rbegin())).Init(_T("d:/master/rc/decoder_mv.txt"));
+
+	bsmgr = new BlockSequenceManager(/*_T("d:/master/rc/decoder_cupu.txt")*/ci);
+	//bsmgr->BuildIndex();
 	
 	for (DrawerBase *sdd : drawers)
 		activeDrawers.push_back(sdd);
@@ -44,7 +121,21 @@ sysuVideo::BlockRelatedDrawer::~BlockRelatedDrawer()
 		delete bsmgr;
 }
 
-void sysuVideo::BlockRelatedDrawer::Decorate(void *img, ...)
+void* sysuVideo::BlockRelatedDrawer::DoForeachDrawer(sysuVideo::DRAWERTYPE type, void* (*op)(sysuVideo::DrawerBase *pDrawer))
+{
+	static void *result;
+
+	std::for_each(activeDrawers.begin(), activeDrawers.end(),
+		[type, op] (DrawerBase *pd) -> void 
+	{
+		if (type == pd->GetDrawerType())
+			result = op(pd);
+	});
+
+	return result;
+}
+
+void sysuVideo::BlockRelatedDrawer::Decorate(void *img, int /*#num arg*/, ...)
 {
 	va_list ap;
 	int targetFrame;
@@ -54,7 +145,7 @@ void sysuVideo::BlockRelatedDrawer::Decorate(void *img, ...)
 
 	va_start(ap, img);
 	targetFrame = va_arg(ap, int);
-
+	
 	/*if (targetFrame != 9)
 		return ;*/
 
@@ -63,6 +154,7 @@ void sysuVideo::BlockRelatedDrawer::Decorate(void *img, ...)
 	drawBlockInfo();
 	imgLayout.AlphaBlend(pcimg->GetDC(), 0, 0);
 	pcimg->ReleaseDC();
+	va_end(ap);
 }
 
 BOOL sysuVideo::BlockRelatedDrawer::ActivateDrawers(DRAWERTYPE type, BOOL activationCode)
@@ -78,9 +170,32 @@ BOOL sysuVideo::BlockRelatedDrawer::ActivateDrawers(DRAWERTYPE type, BOOL activa
 	return TRUE;
 }
 
-void sysuVideo::BlockRelatedDrawer::AddParams(void *)
+void sysuVideo::BlockRelatedDrawer::AddParams(sysuVideo::PDecoratorParams pParams)
 {
-	MessageBox(NULL, _T("Memeber function AddParams Not implemented"), _T("Not implemented"), MB_OK);
+	//MessageBox(NULL, _T("Memeber function AddParams Not implemented"), _T("Not implemented"), MB_OK);
+	DrawerBase *pd;
+
+	switch (pParams->op)
+	{
+	case DECORATOROPCODE::ADD:
+		pd = BlockDrawersFactory::GetInstance()->CreateDrawer(pParams->dt);
+		if (NULL != pd)
+			activeDrawers.push_back(pd);
+		activeDrawers.sort([] (const DrawerBase* a, const DrawerBase* b) 
+			-> bool { return a->GetDrawerType() > b->GetDrawerType(); });
+		break;
+
+	case DECORATOROPCODE::REMOVE:
+		std::remove_if(activeDrawers.begin(), activeDrawers.end(), [pParams] (DrawerBase *pdb)
+			-> BOOL { return pdb->GetDrawerType() == pParams->dt; });
+		break;
+
+	case DECORATOROPCODE::CHANGESETTING:
+		break;
+
+	default:
+		break;		
+	}
 }
 
 void sysuVideo::BlockRelatedDrawer::drawBlockInfo()
@@ -97,7 +212,7 @@ void sysuVideo::BlockRelatedDrawer::drawBlockInfo()
 
 	bsmgr->Locale(workingFrameCnt);
 	std::for_each(activeDrawers.begin(), activeDrawers.end(),
-		[frm] (DrawerBase *pd) -> void { pd->PreFrameDrawing(frm); });
+		[frm] (DrawerBase *pd) -> void { pd->PreDrawingFrame(frm); });
 
 	hdc = imgLayout.GetDC();
 	pDC->Attach(hdc);
@@ -109,6 +224,11 @@ void sysuVideo::BlockRelatedDrawer::drawBlockInfo()
 
 	pDC->Detach();
 	imgLayout.ReleaseDC();
+}
+
+BOOL sysuVideo::BlockRelatedDrawer::IsReady()
+{
+	return bsmgr->IsReady();
 }
 
 //void splitCU(RECT& rect, std::stack<RECT>& s)

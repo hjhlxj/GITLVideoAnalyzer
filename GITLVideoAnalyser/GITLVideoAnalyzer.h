@@ -2,6 +2,7 @@
 
 #include "VideoReader.h"
 #include "ImageDecorator.h"
+#include "AnalyserControlPanel.h"
 
 namespace sysuVideo
 {
@@ -11,8 +12,9 @@ namespace sysuVideo
 		GITLVideoAnalyzer(void);
 		~GITLVideoAnalyzer(void);
 
+		friend AnalyserControlPanel;
 	public:
-		const CImage& GetCurrentFrame() const;
+		const CImage& GetCurrentFrame();
 		const CImage& GetPreviousFrame();
 		const CImage& GetNextFrame();
 		const CImage& GetNthFrame(unsigned long /*#frame*/);
@@ -31,7 +33,8 @@ namespace sysuVideo
 		void ShowPUInfo(POINT /* Position */);
 		void ShowMV(BOOL flag = TRUE);
 		void ShowDecisionMode(BOOL flag = TRUE);
-
+		BOOL SwitchDecorator();
+		void ShowCompareResult(BOOL flag = TRUE);
 		void MagnifyCU(POINT /* Position */);
 
 		BOOL OpenVideoFile(CString * /* File path */);
@@ -41,7 +44,8 @@ namespace sysuVideo
 		VideoReader *pVReader;
 		BOOL bVideoOpen;
 		ImageDecorator *pImgDeco;
-		BOOL bDecoReady;
+		ImageDecorator *pImgDecoBase;
+		ImageDecorator *pImgCmp;
 
 		unsigned long curWorkingFrmNum;
 	};

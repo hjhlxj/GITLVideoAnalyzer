@@ -32,9 +32,11 @@ inline sysuVideo::DRAWERTYPE sysuVideo::DecisionModeDrawer::GetDrawerType() cons
 }
 
 
-void sysuVideo::DecisionModeDrawer::Init(LPWSTR filepath)
+void sysuVideo::DecisionModeDrawer::Init(LPWSTR filepath, int /*#num arg*/, ...)
 {
 	//enable = TRUE;
+	if (NULL != directStream)
+		fclose(directStream);
 
 	if (0 != _wfopen_s(&directStream, filepath, _T("r")))
 		return;
@@ -87,7 +89,7 @@ void sysuVideo::DecisionModeDrawer::Locale(unsigned long index)
 
 void sysuVideo::DecisionModeDrawer::Draw(ImgBlock *block, CDC *pDC)
 {
-	static CBrush defBrush(RGB(0, 0, 0));
+	static CBrush defBrush(RGB(0, 0, 0)), *oldBrush;
 	static RECT curCU;
 
 	if (!enable)
@@ -110,24 +112,36 @@ void sysuVideo::DecisionModeDrawer::Draw(ImgBlock *block, CDC *pDC)
 
 	curCU = block->area;
 
+	/*++curCU.top;
+	++curCU.left;*/
+	/*--curCU.bottom;
+	--curCU.right;*/
+
 	switch (pDecModes[++dmOffset])
 	{
 	case DECISIONMODE::SKIP:
 		pDC->FillRect(&curCU, brushes.at(DECISIONMODE::SKIP));
+		//oldBrush = pDC->SelectObject(brushes.at(DECISIONMODE::SKIP));
 		break;
 
 	case DECISIONMODE::INTER:
 		pDC->FillRect(&curCU, brushes.at(DECISIONMODE::INTER));
+		//oldBrush = pDC->SelectObject(brushes.at(DECISIONMODE::INTER));
 		break;
 
 	case DECISIONMODE::INTRA:
 		pDC->FillRect(&curCU, brushes.at(DECISIONMODE::INTRA));
+		//oldBrush = pDC->SelectObject(brushes.at(DECISIONMODE::INTRA));
 		break;
 
 	default:
 		pDC->FillRect(&curCU, &defBrush);
+		//oldBrush = pDC->SelectObject(&defBrush);
 		break;
 	}
+
+	/*pDC->Rectangle(&curCU);
+	pDC->SelectObject(oldBrush);*/
 }
 
 
@@ -148,7 +162,7 @@ void sysuVideo::DecisionModeDrawer::getDMsForNextLCU()
 	if (frmCnt != curWorkingFrm)
 	{
 		TCHAR sb[100];
-		swprintf_s(sb, _T("curFrm %d, working Frm %d"), frmCnt, curWorkingFrm);
+		swprintf_s(sb, _T("Unmatch stream location: curFrm %d, working Frm %d"), frmCnt, curWorkingFrm);
 		MessageBox(NULL, sb, _T("ModeDecisionUnit"), MB_OK);
 	}
 

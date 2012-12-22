@@ -18,8 +18,8 @@ namespace sysuVideo
 		CUDRAWER = 0,
 		PUDRAWER,
 		MVDRAWER,
+		DIFFDRAWER,
 		MODEDECISIONDRAWER,
-
 		NONE
 	};
 
@@ -51,14 +51,42 @@ namespace sysuVideo
 		SIZE_nRx2N,			// asymmetric motion partition, (3N/2)x2N + ( N/2)x/2N
 #endif
 		INCOMPLETE_BLOCK = PartSize::SIZE_NONE,
+		LCU,
 		CU_SPLIT = 99,
 		CMD_FLAG
 	};
 
-	typedef struct __ImgBlock
+	typedef struct ___ImgBlock
 	{
 		RECT area;
 		IMGBLOCKTYPETAG type;
 	} ImgBlock, *PImgBlock;
 
+	enum DECORATOROPCODE : short
+	{
+		ADD,
+		REMOVE,
+		CHANGESETTING,
+		NONEOP
+	};
+
+	typedef struct ___DecoratorParams
+	{
+		___DecoratorParams ()
+		{
+			op = DECORATOROPCODE::NONEOP;
+			dt = DRAWERTYPE::NONE;
+			fp = NULL;
+			pimg = NULL;
+		}
+
+		CImage *pimg;
+		DECORATOROPCODE op;
+		DRAWERTYPE dt;
+		LPTSTR fp;
+		COLORREF c1;
+		COLORREF c2;
+		COLORREF c3;
+		UINT penWith;
+	} DecoratorParams, *PDecoratorParams;
 }

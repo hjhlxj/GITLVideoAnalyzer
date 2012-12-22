@@ -5,26 +5,34 @@
 
 sysuVideo::GITLVideoAnalyzer::GITLVideoAnalyzer(void)
 {
-	bVideoOpen = bDecoReady = FALSE;
+	bVideoOpen = FALSE;
 }
 
 
 sysuVideo::GITLVideoAnalyzer::~GITLVideoAnalyzer(void)
 {
+	if (NULL != pImgDecoBase)
+		delete pImgDecoBase;
+
+	if (NULL != pImgCmp)
+		delete pImgCmp;
+
+	if (NULL != pVReader)
+		delete pVReader;
 }
 
-const CImage& sysuVideo::GITLVideoAnalyzer::GetCurrentFrame() const
+const CImage& sysuVideo::GITLVideoAnalyzer::GetCurrentFrame()
 {
 	if (!bVideoOpen)
 		throw EXCEPTION_ACCESS_VIOLATION;
 
-	const CImage &c = pVReader->GetCurFrame();
+	/*const CImage &c = pVReader->GetCurFrame();
 
 	if (!bDecoReady)
 		return c;
 
-	pImgDeco->Decorate((CImage*)&c, curWorkingFrmNum);
-	return c;
+	pImgDeco->Decorate((CImage*)&c, curWorkingFrmNum);*/
+	return GetNthFrame(curWorkingFrmNum);
 }
 
 const CImage& sysuVideo::GITLVideoAnalyzer::GetPreviousFrame() 
@@ -37,7 +45,7 @@ const CImage& sysuVideo::GITLVideoAnalyzer::GetPreviousFrame()
 
 	const CImage& c = pVReader->GetPreFrame();
 	
-	if (!bDecoReady)
+	if (!pImgDeco->IsReady())
 		return c;
 
 	pImgDeco->Decorate((CImage*)&c, --curWorkingFrmNum);
@@ -54,7 +62,7 @@ const CImage& sysuVideo::GITLVideoAnalyzer::GetNextFrame()
 
 	const CImage& c = pVReader->GetNextFrame();
 	
-	if (!bDecoReady)
+	if (!pImgDeco->IsReady())
 		return c;
 
 	pImgDeco->Decorate((CImage*)&c, ++curWorkingFrmNum);
@@ -71,7 +79,7 @@ const CImage& sysuVideo::GITLVideoAnalyzer::GetNthFrame(unsigned long frmNum)
 
 	const CImage& c = pVReader->GetNthFrame(frmNum);
 	
-	if (!bDecoReady)
+	if (!pImgDeco->IsReady())
 		return c;
 
 	pImgDeco->Decorate((CImage*)&c, frmNum);
@@ -146,6 +154,23 @@ void sysuVideo::GITLVideoAnalyzer::ShowDecisionMode(BOOL flag)
 	pImgDeco->ActivateDrawers(DRAWERTYPE::MODEDECISIONDRAWER, flag);
 }
 
+BOOL sysuVideo::GITLVideoAnalyzer::SwitchDecorator()
+{
+	static BOOL bBase = TRUE;
+
+	if (NULL == pImgCmp)
+		return FALSE;
+	
+	pImgDeco = bBase ? pImgCmp : pImgDecoBase;
+	bBase = !bBase;
+	return TRUE;
+}
+
+void sysuVideo::GITLVideoAnalyzer::ShowCompareResult(BOOL flag)
+{
+	pImgDeco->ActivateDrawers(DRAWERTYPE::DIFFDRAWER, flag);
+}
+
 void sysuVideo::GITLVideoAnalyzer::MagnifyCU(POINT position)
 {
 }
@@ -162,8 +187,17 @@ BOOL sysuVideo::GITLVideoAnalyzer::OpenVideoFile(CString *filepath)
 	if (pVReader->Init(filepath))
 	{
 		bVideoOpen = TRUE;
-		pImgDeco = new BlockRelatedDrawer((CImage *)&(pVReader->GetCurFrame()));
-		bDecoReady = TRUE;
+		/*pImgDecoBase = new BlockRelatedDrawer((CImage *)&(pVReader->GetCurFrame()),
+					_T("d:/master/rc/decoder_cupu.txt"), _T("d:/master/rc/decoder_mv.txt"),
+					_T("d:/master/rc/decoder_pred.txt"), _T("d:/master/rc/decoder_cupu.txt"),
+					_T("d:/master/rc/decoder_cupu1.txt"));
+		pImgCmp = new BlockRelatedDrawer((CImage *)&(pVReader->GetCurFrame()),
+					_T("d:/master/rc/decoder_cupu1.txt"), _T("d:/master/rc/decoder_mv.txt"),
+					_T("d:/master/rc/decoder_pred.txt"), _T("d:/master/rc/decoder_cupu1.txt"),
+					_T("d:/master/rc/decoder_cupu.txt"));*/
+		pImgDecoBase = new BlockRelatedDrawer((CImage *)&(pVReader->GetCurFrame()));
+		pImgCmp = new BlockRelatedDrawer((CImage *)&(pVReader->GetCurFrame()));
+		pImgDeco = pImgDecoBase;
 		curWorkingFrmNum = 0;
 		return TRUE;
 	}

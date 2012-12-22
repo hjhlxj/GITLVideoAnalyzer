@@ -30,7 +30,8 @@ sysuVideo::MagnifyWnd::MagnifyWnd(int width, int height)
     //
     CRect rect (0, 0, width, height);
     CalcWindowRect (&rect);
-    SetWindowPos (NULL, 0, 0, rect.Width (), rect.Height (),
+	posRect = rect;
+	SetWindowPos (&CWnd::wndTopMost, 0, 0, rect.Width(), rect.Height(),
         SWP_NOZORDER | SWP_NOMOVE | SWP_NOREDRAW);
 }
 
@@ -43,6 +44,11 @@ BOOL sysuVideo::MagnifyWnd::Show()
 {
 	if (TRUE != isWndHiden)
 		return TRUE;
+	
+	/*static CRect rect (0, 0, wndWidth, wndHeight);
+    CalcWindowRect (&rect);*/
+	SetWindowPos (&CWnd::wndTopMost, 0, 0, posRect.Width(), posRect.Height(),
+        SWP_NOZORDER | SWP_NOMOVE | SWP_NOREDRAW);
 
     this->ShowWindow(SW_SHOW);
     this->UpdateWindow();

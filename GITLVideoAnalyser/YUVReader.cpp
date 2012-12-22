@@ -32,7 +32,7 @@ inline void sysuVideo::YUVReader::constructFrame()
 {
 	int rowUV = width / 2, posUV, cnt = 0, bcnt = -1, pitch = frameBuf.GetPitch();
 	LPBYTE bits = (LPBYTE)frameBuf.GetBits();
-	BYTE R, G, B;
+	int R, G, B;
 	
 	fread(Y, sizeof(BYTE), YCount, videoStream);
 	fread(U, sizeof(BYTE), UCount, videoStream);
@@ -47,6 +47,9 @@ inline void sysuVideo::YUVReader::constructFrame()
 			G = Y[cnt] + coeGU * (U[posUV] - 128) + coeGV * (V[posUV] - 128);
 			B = Y[cnt] + coeBU * (U[posUV] - 128);
 			//frameBuf.SetPixelRGB(j, i, R, G, B);
+			R = min(255, max(0, R));
+			G = min(255, max(0, G));
+			B = min(255, max(0, B));
 			bits[++bcnt] = B;
 			bits[++bcnt] = G;
 			bits[++bcnt] = R;

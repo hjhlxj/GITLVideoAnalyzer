@@ -11,17 +11,17 @@ sysuVideo::DrawerBase::~DrawerBase(void)
 {
 }
 
-void sysuVideo::DrawerBase::PreFrameDrawing(unsigned long /* #frame to be draw */)
+void sysuVideo::DrawerBase::PreDrawingFrame(unsigned long /* #frame to be draw */)
 {
 	//Do nothing here
 }
 
-void sysuVideo::DrawerBase::Init(LPWSTR /* filepath */)
+void sysuVideo::DrawerBase::Init(LPWSTR /* filepath */, int /*#num arg*/, ...)
 {
 	//Do nothing here
 }
 
-void sysuVideo::DrawerBase::Init()
+void sysuVideo::DrawerBase::Init(int /*#num arg*/, ...)
 {
 	//Do nothing here
 }
@@ -31,7 +31,7 @@ void sysuVideo::DrawerBase::Enable(BOOL enableFlag = false)
 	enable = enableFlag;
 }
 
-BOOL sysuVideo::DrawerBase::IsEnalbe() const
+BOOL sysuVideo::DrawerBase::IsEnable() const
 {
 	return enable;
 }

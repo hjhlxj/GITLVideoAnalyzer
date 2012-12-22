@@ -1,6 +1,7 @@
 #pragma once
 #include "afxwin.h"
 
+#include "AnalyserControlPanel.h"
 
 // ControlDialogBar dialog
 
@@ -26,7 +27,7 @@ protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 
 	afx_msg LONG OnInitDialog(UINT, LONG);
-
+	sysuVideo::AnalyserControlPanel acp;
 	DECLARE_MESSAGE_MAP()
 
 public:
@@ -39,4 +40,8 @@ public:
 	afx_msg void OnBnClickedPUcheck();
 	afx_msg void OnBnClickedMVcheck();
 	afx_msg void OnBnClickedMODEcheck();
+	afx_msg void OnBnClickedButtonshowdiff();
+	afx_msg void OnBnClickedRadiocurvideo();
+	afx_msg void OnBnClickedRadiocmpvideo();
+	afx_msg void OnBnClickedButton2();
 };

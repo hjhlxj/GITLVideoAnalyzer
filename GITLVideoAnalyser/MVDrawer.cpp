@@ -19,6 +19,11 @@ sysuVideo::MVDrawer::~MVDrawer(void)
 {
 	if (nullptr != pPUVectors)
 		delete [] pPUVectors;
+	
+	pen.DeleteObject();
+
+	if (NULL != directStream)
+		fclose(directStream);
 }
 
 inline sysuVideo::DRAWERTYPE sysuVideo::MVDrawer::GetDrawerType() const
@@ -26,8 +31,11 @@ inline sysuVideo::DRAWERTYPE sysuVideo::MVDrawer::GetDrawerType() const
 	return sysuVideo::DRAWERTYPE::MVDRAWER;
 }
 
-void sysuVideo::MVDrawer::Init(LPWSTR filepath)
+void sysuVideo::MVDrawer::Init(LPWSTR filepath, int /*#num arg*/, ...)
 {
+	if (NULL != directStream)
+		fclose(directStream);
+
 	if (0 != _wfopen_s(&directStream, filepath, _T("r")))
 		return;
 

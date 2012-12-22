@@ -8,7 +8,7 @@ sysuVideo::CUDrawer::CUDrawer(void)
 
 	penWidth = 1;
 	penStyle = PS_SOLID;
-	penColor = RGB(128, 128, 128);
+	penColor = RGB(255, 0, 255);
 	pen.CreatePen(penStyle, penWidth, penColor);
 
 	//drawFlag = new BYTE[1000];
@@ -26,7 +26,7 @@ inline sysuVideo::DRAWERTYPE sysuVideo::CUDrawer::GetDrawerType() const
 	return sysuVideo::DRAWERTYPE::CUDRAWER;
 }
 
-void sysuVideo::CUDrawer::Init()
+void sysuVideo::CUDrawer::Init(int /*#num arg*/, ...)
 {
 	//enable = TRUE;
 	return;
@@ -91,19 +91,23 @@ void sysuVideo::CUDrawer::Draw(ImgBlock *block, CDC *pDC)
 	static RECT curCU;
 	static RECT *cu;
 
-	if (!enable || IMGBLOCKTYPETAG::CU_SPLIT != block->type)
+	if (!enable || (IMGBLOCKTYPETAG::CU_SPLIT != block->type && 
+		IMGBLOCKTYPETAG::LCU != block->type))
 		return;
 	
 	oldPen = pDC->SelectObject(&pen);
 	cu = &(block->area);
 
-	//Middle vertical
-	pDC->MoveTo((cu->left + cu->right) / 2, cu->top);
-	pDC->LineTo((cu->left + cu->right) / 2, cu->bottom); 
+	if (IMGBLOCKTYPETAG::CU_SPLIT == block->type)
+	{
+		//Middle vertical
+		pDC->MoveTo((cu->left + cu->right) / 2, cu->top);
+		pDC->LineTo((cu->left + cu->right) / 2, cu->bottom); 
 
-	//Middle horizontal
-	pDC->MoveTo(cu->left, (cu->top + cu->bottom) / 2);
-	pDC->LineTo(cu->right, (cu->top + cu->bottom) / 2);
+		//Middle horizontal
+		pDC->MoveTo(cu->left, (cu->top + cu->bottom) / 2);
+		pDC->LineTo(cu->right, (cu->top + cu->bottom) / 2);
+	}
 
 	//Left vertical
 	pDC->MoveTo(cu->left, cu->top);

@@ -22,7 +22,7 @@ inline sysuVideo::DRAWERTYPE sysuVideo::PUDrawer::GetDrawerType() const
 	return sysuVideo::DRAWERTYPE::PUDRAWER;
 }
 
-void sysuVideo::PUDrawer::Init()
+void sysuVideo::PUDrawer::Init(int /*#num arg*/, ...)
 {
 	//enable = TRUE;
 	return;
