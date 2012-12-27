@@ -6,9 +6,9 @@ sysuVideo::PUDrawer::PUDrawer(void)
 {
 	enable = FALSE;
 
-	penWidth = 1;
+	penWidth = DEFAULTPUPENWIDTH;
 	penStyle = PS_SOLID;
-	penColor = RGB(255, 255, 255);
+	penColor = DEFAULTPUCOLOR;
 	pen.CreatePen(penStyle, penWidth, penColor);
 }
 

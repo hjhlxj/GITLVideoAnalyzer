@@ -129,11 +129,13 @@
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="MemoryDoubleBufferingShower.h" />
     <ClInclude Include="MVDrawer.h" />
+    <ClInclude Include="PenBrushChooser.h" />
     <ClInclude Include="PUDrawer.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="StreamDirectedDrawer.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="VideoInformationDlg.h" />
     <ClInclude Include="VideoReader.h" />
     <ClInclude Include="YUVReader.h" />
   </ItemGroup>
@@ -157,12 +159,14 @@
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="MemoryDoubleBufferingShower.cpp" />
     <ClCompile Include="MVDrawer.cpp" />
+    <ClCompile Include="PenBrushChooser.cpp" />
     <ClCompile Include="PUDrawer.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="StreamDirectedDrawer.cpp" />
+    <ClCompile Include="VideoInformationDlg.cpp" />
     <ClCompile Include="VideoReader.cpp" />
     <ClCompile Include="VideoReaderFactory.cpp" />
     <ClCompile Include="YUVReader.cpp" />

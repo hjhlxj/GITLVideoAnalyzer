@@ -8,11 +8,11 @@ sysuVideo::DecisionModeDrawer::DecisionModeDrawer(void)
 
 	pDecModes = new BYTE[1000];
 
-	brushes.insert(std::make_pair(DECISIONMODE::SKIP, new CBrush(RGB(150, 73, 18))));
+	brushes.insert(std::make_pair(DECISIONMODE::SKIP, new CBrush(DEFAULTSKIPCOLOR)));
 
-	brushes.insert(std::make_pair(DECISIONMODE::INTER, new CBrush(RGB(67, 0, 128))));
+	brushes.insert(std::make_pair(DECISIONMODE::INTER, new CBrush(DEFAULTINTERCOLOR)));
 
-	brushes.insert(std::make_pair(DECISIONMODE::INTRA, new CBrush(RGB(255, 67, 67))));
+	brushes.insert(std::make_pair(DECISIONMODE::INTRA, new CBrush(DEFAULTINTRACOLOR)));
 }
 
 
@@ -31,6 +31,15 @@ inline sysuVideo::DRAWERTYPE sysuVideo::DecisionModeDrawer::GetDrawerType() cons
 	return sysuVideo::DRAWERTYPE::MODEDECISIONDRAWER;
 }
 
+void sysuVideo::DecisionModeDrawer::SetColorEX(COLORREF skip, COLORREF inter, COLORREF intra)
+{
+	delete brushes[DECISIONMODE::SKIP];
+	brushes[DECISIONMODE::SKIP] = new CBrush(skip);
+	delete brushes[DECISIONMODE::INTER];
+	brushes[DECISIONMODE::INTER] = new CBrush(inter);
+	delete brushes[DECISIONMODE::SKIP];
+	brushes[DECISIONMODE::INTRA] = new CBrush(intra);
+}
 
 void sysuVideo::DecisionModeDrawer::Init(LPWSTR filepath, int /*#num arg*/, ...)
 {

@@ -6,9 +6,9 @@ sysuVideo::MVDrawer::MVDrawer(void)
 {
 	enable = FALSE;
 
-	penWidth = 1;
+	penWidth = DEFAULTMVPENWIDTH;
 	penStyle = PS_SOLID;
-	penColor = RGB(0, 255, 0);
+	penColor = DEFAULTMVCOLOR;
 	pen.CreatePen(penStyle, penWidth, penColor);
 
 	pPUVectors = new short[1000];

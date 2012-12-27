@@ -39,6 +39,7 @@ namespace sysuVideo
 
 		BOOL OpenVideoFile(CString * /* File path */);
 		BOOL OpenAnalyticalFile(LPWSTR /* File path */);
+		BOOL SaveVideo(CString * /* File path */);
 
 	private:
 		VideoReader *pVReader;

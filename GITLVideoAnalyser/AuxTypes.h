@@ -4,7 +4,23 @@
 
 namespace sysuVideo
 {
+	//coeRV(1.13983), coeGU(-0.39465), coeGV(-0.58060), coeBU(2.03211)
+	static const double TCOERV = 1.13983;
+	static const double TCOEGU = -0.39465;
+	static const double TCOEGV = -0.58060;
+	static const double TCOEBU = 2.03211;
 	static const int LCUSIZE = 64;
+	static const int DEFAULTCUPENWIDTH = 1;
+	static const int DEFAULTPUPENWIDTH = 1;
+	static const int DEFAULTMVPENWIDTH = 1;
+	static const int DEFAULTDIFFPENWIDTH = 2;
+	static const COLORREF DEFAULTCUCOLOR = RGB(255, 0, 255);
+	static const COLORREF DEFAULTPUCOLOR = RGB(255, 255, 255);
+	static const COLORREF DEFAULTMVCOLOR = RGB(0, 255, 0);
+	static const COLORREF DEFAULTDIFFCOLOR = RGB(255, 0, 0);
+	static const COLORREF DEFAULTSKIPCOLOR = RGB(150, 73, 18);
+	static const COLORREF DEFAULTINTERCOLOR = RGB(67, 0, 128);
+	static const COLORREF DEFAULTINTRACOLOR = RGB(255, 67, 67);
 
 	enum DECISIONMODE : short 
 	{

@@ -261,9 +261,12 @@ void ControlDialogBar::OnBnClickedRadiocmpvideo()
 
 	if (!((CButton *)GetDlgItem(IDC_RADIOCURVIDEO))->GetCheck())
 	{
-		((CGITLVideoAnalyserView *)((CMainFrame *)::AfxGetMainWnd())->GetActiveView())->GetDocument()->gva.SwitchDecorator();
-		((CGITLVideoAnalyserView *)((CMainFrame *)::AfxGetMainWnd())->GetActiveView())->GetDocument()->gva.ShowCompareResult(TRUE);
-		((CGITLVideoAnalyserView *)((CMainFrame *)::AfxGetMainWnd())->GetActiveView())->ShowNthFrame(m_edit);
+		//((CGITLVideoAnalyserView *)((CMainFrame *)::AfxGetMainWnd())->GetActiveView())->GetDocument()->gva.SwitchDecorator();
+		//((CGITLVideoAnalyserView *)((CMainFrame *)::AfxGetMainWnd())->GetActiveView())->GetDocument()->gva.ShowCompareResult(TRUE);
+		//((CGITLVideoAnalyserView *)((CMainFrame *)::AfxGetMainWnd())->GetActiveView())->ShowNthFrame(m_edit);
+		GetGVA().SwitchDecorator();
+		GetGVA().ShowCompareResult(TRUE);
+		GetGITLAppView()->ShowNthFrame(m_edit);
 		((CButton *)GetDlgItem(IDC_RADIOCURVIDEO))->SetCheck(BST_UNCHECKED);
 		((CButton *)GetDlgItem(IDC_RADIOCMPVIDEO))->SetCheck(BST_CHECKED);
 	}
@@ -273,5 +276,6 @@ void ControlDialogBar::OnBnClickedButton2()
 {
 	// TODO: Add your control notification handler code here
 	
-	acp.DoModal();
+	if (IDOK == acp.DoModal())
+		GetGITLAppView()->ShowNthFrame(m_edit);
 }

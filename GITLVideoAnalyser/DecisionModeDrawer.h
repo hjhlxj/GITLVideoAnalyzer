@@ -18,6 +18,7 @@ namespace sysuVideo
 		virtual void Draw(ImgBlock * /* block */, CDC * /* Device context of the image layer */) override; 
 		virtual void Locale(unsigned long /* #frame */) override;
 		virtual void Init(LPWSTR /* filepath */, int /*#num arg*/, ...) override;
+		void SetColorEX(COLORREF skip, COLORREF inter, COLORREF intra);
 
 	protected:	//Auxiliary
 		virtual void BuildIndex() override;

@@ -104,6 +104,8 @@ sysuVideo::BlockRelatedDrawer::BlockRelatedDrawer(CImage *ci)
 	drawers.push_back(new MVDrawer());
 	//(**(drawers.rbegin())).Init(_T("d:/master/rc/decoder_mv.txt"));
 
+	drawers.push_back(new DiffDrawer());
+
 	bsmgr = new BlockSequenceManager(/*_T("d:/master/rc/decoder_cupu.txt")*/ci);
 	//bsmgr->BuildIndex();
 	

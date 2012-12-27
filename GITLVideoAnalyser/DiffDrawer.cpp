@@ -6,9 +6,9 @@ sysuVideo::DiffDrawer::DiffDrawer(void)
 {
 	enable = FALSE;
 
-	penWidth = 2;
+	penWidth = DEFAULTDIFFPENWIDTH;
 	penStyle = PS_SOLID;
-	penColor = RGB(255, 0, 0);
+	penColor = DEFAULTDIFFCOLOR;
 	pen.CreatePen(penStyle, penWidth, penColor);
 }
 

@@ -22,6 +22,7 @@ namespace sysuVideo
 		virtual BOOL Init(LPVOID /*structure of initialization info*/) override;
 		virtual void Save(LPCWSTR /*file path*/, LPVOID /*structure of save info*/) override;
 		virtual BOOL InitViaFilepath(CString /*filepath*/);
+		virtual BOOL InitViaInteraction();
 
 	protected:	//Member functions
 		void constructFrame();

@@ -1,6 +1,7 @@
 #pragma once
 #include "afxdlgs.h"
 #include "AnalyticalFileChooser.h"
+#include "PenBrushChooser.h"
 
 namespace sysuVideo
 {
@@ -14,6 +15,8 @@ namespace sysuVideo
 	public:
 		virtual INT_PTR DoModal() override;
 		AnalyticalFileChooser fileChooser;
+		PenBrushChooser penChooser;
+
 		DECLARE_MESSAGE_MAP()
 		afx_msg void OnApplyNow();
 	};

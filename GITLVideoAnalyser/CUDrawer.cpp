@@ -6,9 +6,9 @@ sysuVideo::CUDrawer::CUDrawer(void)
 {
 	enable = FALSE;
 
-	penWidth = 1;
+	penWidth = DEFAULTCUPENWIDTH;
 	penStyle = PS_SOLID;
-	penColor = RGB(255, 0, 255);
+	penColor = DEFAULTCUCOLOR;
 	pen.CreatePen(penStyle, penWidth, penColor);
 
 	//drawFlag = new BYTE[1000];
