@@ -33,12 +33,11 @@ BEGIN_MESSAGE_MAP(CGITLVideoAnalyserView, CScrollView)
 	ON_WM_LBUTTONUP()
 	ON_WM_MOUSEMOVE()
 	ON_WM_LBUTTONDBLCLK()
+	ON_COMMAND(ID_EXPORTAS_JPEG, &CGITLVideoAnalyserView::OnExportAsJpeg)
 END_MESSAGE_MAP()
 
-// CGITLVideoAnalyserView construction/destruction
-static CImage ___cimgforinit;
 
-CGITLVideoAnalyserView::CGITLVideoAnalyserView() : bufCurrentFrame(___cimgforinit)
+CGITLVideoAnalyserView::CGITLVideoAnalyserView() : bufCurrentFrame(NULL)
 {
 	// TODO: add construction code here
 
@@ -78,16 +77,16 @@ void CGITLVideoAnalyserView::OnDraw(CDC* pDC)
 	
 	((CMainFrame *)GetParent())->m_wndToolBox.SetTotalFrameCnt(pDoc->gva.GetFrameCount());
 
-	const CImage& cimg = this->GetDocument()->gva.GetCurrentFrame();
+	CImage* cimg = this->GetDocument()->gva.GetCurrentFrame();
 	bufCurrentFrame = cimg;
 	if (showWidth <= 0 || showHeight <= 0)
 	{
-		showWidth = cimg.GetWidth();
-		showHeight = cimg.GetHeight();
+		showWidth = cimg->GetWidth();
+		showHeight = cimg->GetHeight();
 	}
 
 	//cimg.Draw(pDC->m_hDC, 0, 0, cimg.GetWidth(), cimg.GetHeight());
-	mdbShower.ShowImage(pDC, dpZero.x, dpZero.y, showWidth, showHeight, cimg);
+	mdbShower.ShowImage(pDC, dpZero.x, dpZero.y, showWidth, showHeight, *cimg);
 }
 
 
@@ -136,9 +135,9 @@ BOOL CGITLVideoAnalyserView::ShowNextFrame(void)
 	CDC *pDC = this->GetDC();
 	BOOL showStatus = FALSE;
 
-	const CImage& cimg = this->GetDocument()->gva.GetNextFrame();
+	CImage* cimg = this->GetDocument()->gva.GetNextFrame();
 	//cimg.Draw(pDC->m_hDC, dpZero.x, dpZero.y, cimg.GetWidth(), cimg.GetHeight());
-	mdbShower.ShowImage(pDC, dpZero.x, dpZero.y, showWidth, showHeight, cimg);
+	mdbShower.ShowImage(pDC, dpZero.x, dpZero.y, showWidth, showHeight, *cimg);
 	bufCurrentFrame = cimg;
 	showStatus = TRUE;
 	
@@ -150,9 +149,9 @@ BOOL CGITLVideoAnalyserView::ShowPreFrame(void)
 	CDC *pDC = this->GetDC();
 	BOOL showStatus = FALSE;
 
-	const CImage& cimg = this->GetDocument()->gva.GetPreviousFrame();
+	CImage* cimg = this->GetDocument()->gva.GetPreviousFrame();
 	//cimg.Draw(pDC->m_hDC, dpZero.x, dpZero.y, cimg.GetWidth(), cimg.GetHeight());
-	mdbShower.ShowImage(pDC, dpZero.x, dpZero.y, showWidth, showHeight, cimg);
+	mdbShower.ShowImage(pDC, dpZero.x, dpZero.y, showWidth, showHeight, *cimg);
 	bufCurrentFrame = cimg;
 	showStatus = TRUE;
 
@@ -164,9 +163,9 @@ BOOL CGITLVideoAnalyserView::ShowNthFrame(unsigned long frmNum)
 	CDC *pDC = this->GetDC();
 	BOOL showStatus = FALSE;
 
-	const CImage& cimg = this->GetDocument()->gva.GetNthFrame(frmNum);
+	CImage* cimg = this->GetDocument()->gva.GetNthFrame(frmNum);
 	//cimg.Draw(pDC->m_hDC, dpZero.x, dpZero.y, cimg.GetWidth(), cimg.GetHeight());
-	mdbShower.ShowImage(pDC, dpZero.x, dpZero.y, showWidth, showHeight, cimg);
+	mdbShower.ShowImage(pDC, dpZero.x, dpZero.y, showWidth, showHeight, *cimg);
 	bufCurrentFrame = cimg;
 	showStatus = TRUE;
 
@@ -178,16 +177,16 @@ BOOL CGITLVideoAnalyserView::ShowWithRefresh()
 	CDC *pDC = this->GetDC();
 	BOOL showStatus = FALSE;
 
-	const CImage& cimg = this->GetDocument()->gva.GetCurrentFrame();
+	CImage* cimg = this->GetDocument()->gva.GetCurrentFrame();
 	//cimg.Draw(pDC->m_hDC, dpZero.x, dpZero.y, cimg.GetWidth(), cimg.GetHeight());
-	mdbShower.ShowImage(pDC, dpZero.x, dpZero.y, showWidth, showHeight, cimg);
+	mdbShower.ShowImage(pDC, dpZero.x, dpZero.y, showWidth, showHeight, *cimg);
 	bufCurrentFrame = cimg;
 	showStatus = TRUE;
 
 	return showStatus;
 }
 
-const CImage& CGITLVideoAnalyserView::getBufferedCurrentFrame()
+CImage* CGITLVideoAnalyserView::getBufferedCurrentFrame()
 {
 	return bufCurrentFrame;
 }
@@ -208,11 +207,11 @@ BOOL CGITLVideoAnalyserView::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 		magnifyCoe -= .05;
 	
 	//const CImage& cimg = this->GetDocument()->gva.GetCurrentFrame();
-	const CImage& cimg = getBufferedCurrentFrame();
+	CImage* cimg = getBufferedCurrentFrame();
 
-	showWidth = cimg.GetWidth() * magnifyCoe;
-	showHeight = cimg.GetHeight() * magnifyCoe;
-	mdbShower.ShowImage(pDC, dpZero.x, dpZero.y, showWidth, showHeight, cimg);
+	showWidth = cimg->GetWidth() * magnifyCoe;
+	showHeight = cimg->GetHeight() * magnifyCoe;
+	mdbShower.ShowImage(pDC, dpZero.x, dpZero.y, showWidth, showHeight, *cimg);
 	showStatus = TRUE;
 
 	return CScrollView::OnMouseWheel(nFlags, zDelta, pt) && showStatus;
@@ -262,12 +261,12 @@ void CGITLVideoAnalyserView::OnMouseMove(UINT nFlags, CPoint point)
 	BOOL showStatus = FALSE;
 	static CPoint pOffset;
 	//const CImage& cimg = this->GetDocument()->gva.GetCurrentFrame();
-	const CImage& cimg = getBufferedCurrentFrame();
+	CImage* cimg = getBufferedCurrentFrame();
 	
 	pOffset = point - lbdCapture;
 	dpZero += pOffset;
 	lbdCapture += pOffset;
-	mdbShower.ShowImage(pDC, dpZero.x, dpZero.y, showWidth, showHeight, cimg);
+	mdbShower.ShowImage(pDC, dpZero.x, dpZero.y, showWidth, showHeight, *cimg);
 }
 
 
@@ -282,14 +281,34 @@ void CGITLVideoAnalyserView::OnLButtonDblClk(UINT nFlags, CPoint point)
 	targetCUPos.y = (point.y - dpZero.y) / magnifyCoe;
 
 	//const CImage& cimg = this->GetDocument()->gva.GetCurrentFrame();
-	const CImage& cimg = getBufferedCurrentFrame();
+	CImage* cimg = getBufferedCurrentFrame();
 
 	if (targetCUPos.x < 0 || targetCUPos.y < 0 || 
-		targetCUPos.x > cimg.GetWidth() || targetCUPos.y > cimg.GetHeight())
+		targetCUPos.x > cimg->GetWidth() || targetCUPos.y > cimg->GetHeight())
 		return;
 
 	targetCUPos.x -= targetCUPos.x % sysuVideo::LCUSIZE;
 	targetCUPos.y -= targetCUPos.y % sysuVideo::LCUSIZE;
 
-	magWnd->ShowContent(targetCUPos.x, targetCUPos.y, cimg);
+	magWnd->ShowContent(targetCUPos.x, targetCUPos.y, *cimg);
+}
+
+
+void CGITLVideoAnalyserView::OnExportAsJpeg()
+{
+	// TODO: Add your command handler code here
+	CFileDialog fileDlg( FALSE, 
+						_T("Export Current Frame as JPEG"),
+						_T("GITLFrameImage.jpeg"),
+						OFN_NOTESTFILECREATE | OFN_OVERWRITEPROMPT,
+						_T("JPEG Image (*.jpeg; *.jpg)||"));
+	
+	if (IDOK == fileDlg.DoModal())
+	{
+		CString pathName = fileDlg.GetPathName();
+		if (GetDocument()->gva.ExportAsImage(pathName))
+			MessageBox(_T("Successfully exported current frame as image"), _T("Operation Succeed"), MB_OK);
+		else
+			MessageBox(_T("Failed exported current frame as image"), _T("Operation Failed"), MB_ICONERROR);
+	}
 }

@@ -14,10 +14,10 @@ namespace sysuVideo
 
 		friend AnalyserControlPanel;
 	public:
-		const CImage& GetCurrentFrame();
-		const CImage& GetPreviousFrame();
-		const CImage& GetNextFrame();
-		const CImage& GetNthFrame(unsigned long /*#frame*/);
+		CImage* GetCurrentFrame();
+		CImage* GetPreviousFrame();
+		CImage* GetNextFrame();
+		CImage* GetNthFrame(unsigned long /*#frame*/);
 		BOOL HasNextFrame() const;
 		BOOL HasPreviousFrame() const;
 		BOOL HasNthFrame(unsigned long) const;
@@ -39,7 +39,8 @@ namespace sysuVideo
 
 		BOOL OpenVideoFile(CString * /* File path */);
 		BOOL OpenAnalyticalFile(LPWSTR /* File path */);
-		BOOL SaveVideo(CString * /* File path */);
+		BOOL SaveVideo(CArchive& /* File path */);
+		BOOL ExportAsImage(CString /*File path*/);
 
 	private:
 		VideoReader *pVReader;

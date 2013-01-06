@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "GITLVideoAnalyzer.h"
 #include "BlockRelatedDrawer.h"
-
+#include <io.h>
 
 sysuVideo::GITLVideoAnalyzer::GITLVideoAnalyzer(void)
 {
@@ -22,7 +22,7 @@ sysuVideo::GITLVideoAnalyzer::~GITLVideoAnalyzer(void)
 		delete pVReader;
 }
 
-const CImage& sysuVideo::GITLVideoAnalyzer::GetCurrentFrame()
+CImage* sysuVideo::GITLVideoAnalyzer::GetCurrentFrame()
 {
 	if (!bVideoOpen)
 		throw EXCEPTION_ACCESS_VIOLATION;
@@ -36,54 +36,54 @@ const CImage& sysuVideo::GITLVideoAnalyzer::GetCurrentFrame()
 	return GetNthFrame(curWorkingFrmNum);
 }
 
-const CImage& sysuVideo::GITLVideoAnalyzer::GetPreviousFrame() 
+CImage* sysuVideo::GITLVideoAnalyzer::GetPreviousFrame() 
 {
 	if (!bVideoOpen)
 		throw EXCEPTION_ACCESS_VIOLATION;
 
 	if (!pVReader->HasPreFrame())
-		return GetCurrentFrame();
+		return pVReader->GetCurFrame();
 
-	const CImage& c = pVReader->GetPreFrame();
+	CImage* c = pVReader->GetPreFrame();
 	
 	if (!pImgDeco->IsReady())
 		return c;
 
-	pImgDeco->Decorate((CImage*)&c, --curWorkingFrmNum);
+	pImgDeco->Decorate(c, --curWorkingFrmNum);
 	return c;
 }
 
-const CImage& sysuVideo::GITLVideoAnalyzer::GetNextFrame() 
+CImage* sysuVideo::GITLVideoAnalyzer::GetNextFrame() 
 {
 	if (!bVideoOpen)
 		throw EXCEPTION_ACCESS_VIOLATION;
 
 	if (!pVReader->HasNextFrame())
-		return GetCurrentFrame();
+		return pVReader->GetCurFrame();
 
-	const CImage& c = pVReader->GetNextFrame();
+	CImage* c = pVReader->GetNextFrame();
 	
 	if (!pImgDeco->IsReady())
 		return c;
 
-	pImgDeco->Decorate((CImage*)&c, ++curWorkingFrmNum);
+	pImgDeco->Decorate(c, ++curWorkingFrmNum);
 	return c;
 }
 
-const CImage& sysuVideo::GITLVideoAnalyzer::GetNthFrame(unsigned long frmNum)
+CImage* sysuVideo::GITLVideoAnalyzer::GetNthFrame(unsigned long frmNum)
 {
 	if (!bVideoOpen)
 		throw EXCEPTION_ACCESS_VIOLATION;
 
 	if (!pVReader->HasNthFrame(frmNum))
-		return GetCurrentFrame();
+		return pVReader->GetCurFrame();
 
-	const CImage& c = pVReader->GetNthFrame(frmNum);
+	CImage* c = pVReader->GetNthFrame(frmNum);
 	
 	if (!pImgDeco->IsReady())
 		return c;
 
-	pImgDeco->Decorate((CImage*)&c, frmNum);
+	pImgDeco->Decorate(c, frmNum);
 	curWorkingFrmNum = frmNum;
 	return c;
 }
@@ -183,6 +183,13 @@ BOOL sysuVideo::GITLVideoAnalyzer::OpenAnalyticalFile(LPWSTR filepath)
 
 BOOL sysuVideo::GITLVideoAnalyzer::OpenVideoFile(CString *filepath)
 {
+	if (TRUE == bVideoOpen)
+		delete pVReader;
+	if (NULL != pImgCmp)
+		delete pImgCmp;
+	if (NULL != pImgDecoBase)
+		delete pImgDecoBase;
+
 	pVReader = VideoReaderFactory::GetInstance().GetVideoReader(sysuVideo::VIDEOREADERTYPE::YUVREADER);
 
 	if (pVReader->Init(filepath))
@@ -196,8 +203,8 @@ BOOL sysuVideo::GITLVideoAnalyzer::OpenVideoFile(CString *filepath)
 					_T("d:/master/rc/decoder_cupu1.txt"), _T("d:/master/rc/decoder_mv.txt"),
 					_T("d:/master/rc/decoder_pred.txt"), _T("d:/master/rc/decoder_cupu1.txt"),
 					_T("d:/master/rc/decoder_cupu.txt"));*/
-		pImgDecoBase = new BlockRelatedDrawer((CImage *)&(pVReader->GetCurFrame()));
-		pImgCmp = new BlockRelatedDrawer((CImage *)&(pVReader->GetCurFrame()));
+		pImgDecoBase = new BlockRelatedDrawer((CImage *)(pVReader->GetCurFrame()));
+		pImgCmp = new BlockRelatedDrawer((CImage *)(pVReader->GetCurFrame()));
 		pImgDeco = pImgDecoBase;
 		curWorkingFrmNum = 0;
 		return TRUE;
@@ -206,39 +213,43 @@ BOOL sysuVideo::GITLVideoAnalyzer::OpenVideoFile(CString *filepath)
 		return FALSE;
 }
 
-BOOL sysuVideo::GITLVideoAnalyzer::SaveVideo(CString *filepath)
+BOOL sysuVideo::GITLVideoAnalyzer::SaveVideo(CArchive& ar)
 {
 	if (!bVideoOpen)
 		return FALSE;
 
-	const CImage& c = GetNthFrame(0);
-	int rowUV = GetVideoWidth() / 2, posUV, cnt = 0, bcnt = -1, pitch = c.GetPitch(), i, j;
+	unsigned long curFrm = curWorkingFrmNum;
+	CImage* c = GetNthFrame(0);
+	int rowUV = GetVideoWidth() / 2, posUV, cnt = 0, bcnt = -1, pitch = c->GetPitch(), i, j;
 	LPBYTE bits;
-	int R, G, B,  width = c.GetWidth(), height = c.GetHeight(), YCount, UCount, VCount;
+	int R, G, B,  width = c->GetWidth(), height = c->GetHeight(), YCount, UCount, VCount;
 	YCount = width * height;
 	UCount = VCount = YCount / 4;
 	double *y = new double[YCount],
 		   *u = new double[UCount],
 		   *v = new double[VCount];
+	int nor;
 	LPBYTE Y = new BYTE[YCount],
 		   U = new BYTE[UCount],
 		   V = new BYTE[VCount];
 
 	FILE *outputFile;
-
-	if (0 != _wfopen_s(&outputFile, filepath->GetBuffer(), _T("wb"))) {
+	outputFile = _fdopen(_open_osfhandle((intptr_t)(ar.GetFile()->m_hFile), NULL), "w");
+	if (NULL == outputFile)
+		MessageBox(NULL, _T("Can't not open file for writing"), _T("Operation Failed"), MB_ICONERROR);
+	/*if (0 != _wfopen_s(&outputFile, filepath->GetBuffer(), _T("w"))) {
 		MessageBox(NULL, _T("Can't not open file for writing"), _T("Operation Failed"), MB_ICONERROR);
 		filepath->ReleaseBuffer();
 		return FALSE;
 	}
-	filepath->ReleaseBuffer();
+	filepath->ReleaseBuffer();*/
 
-	for (unsigned long frmc = 0; frmc < pVReader->GetFrameCount(); ++frmc)
+	for (unsigned long frmc = 0; frmc < 1/*pVReader->GetFrameCount()*/; ++frmc)
 	{
-		const CImage& cp = GetNthFrame(frmc);
+		c = GetNthFrame(frmc);
 		cnt = 0;
 		bcnt = -1;
-		bits = (LPBYTE)cp.GetBits();
+		bits = (LPBYTE)c->GetBits();
 		ZeroMemory(y, YCount * sizeof(double));
 		ZeroMemory(u, UCount * sizeof(double));
 		ZeroMemory(v, VCount * sizeof(double));
@@ -246,7 +257,6 @@ BOOL sysuVideo::GITLVideoAnalyzer::SaveVideo(CString *filepath)
 		{
 			for (j = 0; j < width; ++j)
 			{
-				posUV = (i / 2) * rowUV + (j / 2);
 				//R = Y[cnt] + coeRV * (V[posUV] - 128);
 				//G = Y[cnt] + coeGU * (U[posUV] - 128) + coeGV * (V[posUV] - 128);
 				//B = Y[cnt] + coeBU * (U[posUV] - 128);
@@ -258,15 +268,18 @@ BOOL sysuVideo::GITLVideoAnalyzer::SaveVideo(CString *filepath)
 				//bits[++bcnt] = G;
 				//bits[++bcnt] = R;
 				//bits[++bcnt] = 255;
-
-				R = bits[++bcnt];
-				G = bits[++bcnt];
 				B = bits[++bcnt];
+				G = bits[++bcnt];
+				R = bits[++bcnt];
 				++bcnt;	//skip transparent bits
 
 				y[cnt] = .299 * R + .587 * G + .114 * B;
-				u[posUV] += (-.14713 * R - .28886 * G + .436 * B);
-				v[posUV] += (.615 * R - .51499 * G -.10001 * B);
+				if (0 == i % 2 && 0 == j % 2)
+				{
+					posUV = (i / 2) * rowUV + (j / 2);
+					u[posUV] = (-.14713 * R - .28886 * G + .436 * B);
+					v[posUV] = (.615 * R - .51499 * G - .10001 * B);
+				}
 				++cnt;
 			}
 
@@ -275,11 +288,16 @@ BOOL sysuVideo::GITLVideoAnalyzer::SaveVideo(CString *filepath)
 		}
 
 		for (i = 0; i < YCount; ++i)
-			Y[i] = y[i] + 128.5;
+		{
+			nor = y[i];// + 128.5;
+			Y[i] = min(255, max(0, nor));
+		}
 		for (i = 0; i < UCount; ++i)
 		{
-			U[i] = u[i] / 4 + 128.5;
-			V[i] = v[i] / 4 + 128.5;
+			nor = u[i] + 128.5;
+			U[i] = min(255, max(0, nor));
+			nor = v[i] + 128.5;
+			V[i] = min(255, max(0, nor));
 		}
 
 		fwrite(Y, sizeof(BYTE), YCount, outputFile);
@@ -287,7 +305,6 @@ BOOL sysuVideo::GITLVideoAnalyzer::SaveVideo(CString *filepath)
 		fwrite(V, sizeof(BYTE), VCount, outputFile);
 	}
 
-	fclose(outputFile);
 	delete [] y;
 	delete [] u;
 	delete [] v;
@@ -295,5 +312,17 @@ BOOL sysuVideo::GITLVideoAnalyzer::SaveVideo(CString *filepath)
 	delete [] U;
 	delete [] V;
 
+	MessageBox(NULL, _T("Operation success"), _T("Save Complete"), MB_OK);
+	GetNthFrame(curFrm);
 	return TRUE;
+}
+
+BOOL sysuVideo::GITLVideoAnalyzer::ExportAsImage(CString savePath)
+{
+	if (FALSE == bVideoOpen)
+		return FALSE;
+
+	CImage *c = GetCurrentFrame();
+	bool failed = FAILED(c->Save(savePath, Gdiplus::ImageFormatJPEG));
+	return !failed;
 }

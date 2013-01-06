@@ -63,7 +63,7 @@ void sysuVideo::YUVReader::constructFrame()
 	}
 }
 
-const CImage& sysuVideo::YUVReader::GetNextFrame() 
+CImage* sysuVideo::YUVReader::GetNextFrame() 
 {	
 	if (!HasNextFrame() || !isStreamOpen)
 		throw EXCEPTION_ACCESS_VIOLATION;
@@ -74,7 +74,7 @@ const CImage& sysuVideo::YUVReader::GetNextFrame()
 	return GetCurFrame();
 }
 
-const CImage& sysuVideo::YUVReader::GetCurFrame() 
+CImage* sysuVideo::YUVReader::GetCurFrame() 
 {
 	//CDC *pDCsrc, *pDCdst;
 
@@ -95,10 +95,10 @@ const CImage& sysuVideo::YUVReader::GetCurFrame()
 	//memcpy(img, &frameBuf, sizeof(frameBuf));--
 
 	//imgDeco->Decorate(&frameBuf, (int)curFrameCnt);
-	return frameBuf;
+	return &frameBuf;
 }
 
-const CImage& sysuVideo::YUVReader::GetPreFrame() 
+CImage* sysuVideo::YUVReader::GetPreFrame() 
 {	
 	if (!HasPreFrame() || !isStreamOpen)
 		throw EXCEPTION_ACCESS_VIOLATION;
@@ -110,7 +110,7 @@ const CImage& sysuVideo::YUVReader::GetPreFrame()
 	return GetCurFrame();
 }
 
-const CImage& sysuVideo::YUVReader::GetNthFrame(unsigned long frmNum)
+CImage* sysuVideo::YUVReader::GetNthFrame(unsigned long frmNum)
 {
 	if (!HasNthFrame(frmNum) || !isStreamOpen)
 		throw EXCEPTION_ACCESS_VIOLATION;

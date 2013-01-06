@@ -19,10 +19,10 @@ namespace sysuVideo
 		virtual BOOL HasNextFrame() const = 0;
 		virtual BOOL HasPreFrame() const = 0;
 		virtual BOOL HasNthFrame(unsigned long /*frame number*/) const = 0;
-		virtual const CImage& GetNextFrame() = 0;
-		virtual const CImage& GetPreFrame() = 0;
-		virtual const CImage& GetCurFrame() = 0;
-		virtual const CImage& GetNthFrame(unsigned long /*#frame*/) = 0;
+		virtual CImage* GetNextFrame() = 0;
+		virtual CImage* GetPreFrame() = 0;
+		virtual CImage* GetCurFrame() = 0;
+		virtual CImage* GetNthFrame(unsigned long /*#frame*/) = 0;
 		virtual BOOL Init(LPVOID /*structure of initialization info*/) = 0;
 		virtual BOOL Open(LPCWSTR /*file path*/);
 		virtual void Save(LPCWSTR /*file path*/, LPVOID /*structure of save info*/) = 0;

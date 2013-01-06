@@ -275,7 +275,12 @@ void ControlDialogBar::OnBnClickedRadiocmpvideo()
 void ControlDialogBar::OnBnClickedButton2()
 {
 	// TODO: Add your control notification handler code here
-	
+	/*FILE *f;
+	int err = _wfopen_s(&f, _T("F:\\hi.txt"), _T("w"));
+	if (0 != err)
+		MessageBox(_T("no permission"), _T("no"), MB_OK);
+	fprintf_s(f, "Hi");
+	fclose(f);*/
 	if (IDOK == acp.DoModal())
 		GetGITLAppView()->ShowNthFrame(m_edit);
 }

@@ -15,10 +15,10 @@ namespace sysuVideo
 		virtual BOOL HasNextFrame() const override;
 		virtual BOOL HasPreFrame() const override;
 		virtual BOOL HasNthFrame(unsigned long /*#frame*/) const override;
-		virtual const CImage& GetNthFrame(unsigned long /*frame number*/) override;
-		virtual const CImage& GetNextFrame() override;
-		virtual const CImage& GetPreFrame() override;
-		virtual const CImage& GetCurFrame() override;
+		virtual CImage* GetNthFrame(unsigned long /*frame number*/) override;
+		virtual CImage* GetNextFrame() override;
+		virtual CImage* GetPreFrame() override;
+		virtual CImage* GetCurFrame() override;
 		virtual BOOL Init(LPVOID /*structure of initialization info*/) override;
 		virtual void Save(LPCWSTR /*file path*/, LPVOID /*structure of save info*/) override;
 		virtual BOOL InitViaFilepath(CString /*filepath*/);

@@ -61,7 +61,7 @@ void CGITLVideoAnalyserDoc::Serialize(CArchive& ar)
 	{
 		// TODO: add storing code here
 		CString filepath = ar.GetFile()->GetFilePath();
-		gva.SaveVideo(&filepath);
+		gva.SaveVideo(ar);
 	}
 	else
 	{
